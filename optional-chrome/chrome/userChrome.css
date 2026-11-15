@@ -146,7 +146,9 @@ menupopup,
   --panel-separator-color: rgba(100, 130, 170, .18) !important;
 }
 
-menupopup,
+/* Menus paint on their rounded inner part; painting the menupopup itself
+   leaves a square box around the rounded corners. */
+menupopup::part(content),
 panelview,
 .panel-arrowcontent,
 .panel-subview-body {
@@ -158,7 +160,7 @@ panelview,
   border-color: var(--eh-border) !important;
 }
 
-menupopup,
+menupopup::part(content),
 .panel-arrowcontent {
   box-shadow:
     0 12px 38px rgba(0,0,0,.42),
