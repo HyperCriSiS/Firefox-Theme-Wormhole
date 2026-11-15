@@ -67,6 +67,10 @@ menus and panels to match.
 3. Copy the `chrome` folder from `optional-chrome` into the profile folder.
 4. Restart the browser.
 
+Waterfox only: to give the status bar at the bottom the same dark background
+without an edge, create the boolean pref `wormhole.statusbar.seamless` in
+`about:config`, set it to `true` and restart.
+
 > [!NOTE]
 > `userChrome.css` is not an official API and may need adjustments after major browser updates.
 
