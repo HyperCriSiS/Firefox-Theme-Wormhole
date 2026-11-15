@@ -70,15 +70,21 @@
   --tabs-navbar-separator-color: transparent !important;
 }
 
-/* Waterfox status bar at the bottom. No effect in Firefox, which has none. */
-#status-bar {
-  background-color: #02050c !important;
-  background-image: none !important;
+/* Waterfox status bar at the bottom. No effect in Firefox, which has none.
+   Opt-in: create the boolean pref wormhole.statusbar.seamless = true in
+   about:config. */
+@media -moz-pref("wormhole.statusbar.seamless") {
+  #status-bar {
+    background-color: #02050c !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
 }
 
 #navigator-toolbox,
 #nav-bar,
-#status-bar,
 #tabbrowser-tabbox,
 #tabbrowser-tabpanels,
 .browserStack {
