@@ -74,7 +74,11 @@
    Opt-in: create the boolean pref wormhole.statusbar.seamless = true in
    about:config. */
 @media -moz-pref("wormhole.statusbar.seamless") {
-  #status-bar {
+  /* Matched by its status text item, since the toolbar id differs between
+     Waterfox versions. Covers the toolbar and its wrapping box. */
+  #status-bar,
+  toolbar:has(> #status-text),
+  vbox:has(> toolbar > #status-text) {
     background-color: #02050c !important;
     background-image: none !important;
     border: 0 !important;
