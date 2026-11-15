@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="dark light">
+  <title>Wormhole settings</title>
+  <style>
+    body { font: 14px system-ui, sans-serif; margin: 16px; }
+    fieldset { margin-bottom: 16px; border-radius: 6px; }
+    img { display: block; max-width: 100%; max-height: 120px; margin: 8px 0; }
+    small { display: block; opacity: .7; margin-top: 6px; }
+    label { display: block; margin-bottom: 8px; }  </style>
+</head>
+<body>
+  <fieldset data-key="headerImage" data-default="images/theme_frame.png">
+    <legend>Header image</legend>
+    <img alt="">
+    <input type="file" accept="image/*">
+    <button type="button">Reset</button>
+    <small>Anchored top right at its original size. Use an image about 3840 × 320 px.</small>
+  </fieldset>
+  <fieldset data-key="newtabImage" data-default="images/newtab-space.jpg">
+    <legend>New tab background</legend>
+    <img alt="">
+    <input type="file" accept="image/*">
+    <button type="button">Reset</button>
+  </fieldset>
+  <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
+  <label><input type="checkbox" id="homepage"> Also show the Wormhole page in new windows and for the Home button</label>
+  <script src="options.js"></script>
+</body>
+</html>

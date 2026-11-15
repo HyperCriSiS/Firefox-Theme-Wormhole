@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>New Tab</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="scene" aria-hidden="true"></div>
+  <div class="header-continuation" aria-hidden="true"></div>
+  <div class="cinematic-shade" aria-hidden="true"></div>
+  <div id="particle-layer" class="particle-layer" aria-hidden="true"></div>
+
+  <main class="newtab">
+    <section class="search-dock" aria-label="Web search">
+      <div class="energy-disc" aria-hidden="true"></div>
+      <div class="search-shell">
+        <form id="search-form" class="search-form" autocomplete="off">
+          <span class="search-symbol" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <circle cx="10.7" cy="10.7" r="6.7"></circle>
+              <path d="M15.8 15.8 21 21"></path>
+            </svg>
+          </span>
+          <input
+            id="search-input"
+            name="q"
+            type="text"
+            inputmode="search"
+            enterkeyhint="go"
+            spellcheck="false"
+            aria-label="Search the web or enter an address"
+          >
+          <button class="launch-button" type="submit" aria-label="Go">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h13"></path>
+              <path d="m14 7 5 5-5 5"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div class="search-ornament" aria-hidden="true">
+        <span class="ornament-ring ornament-ring--outer"></span>
+        <span class="ornament-ring ornament-ring--mid"></span>
+        <span class="ornament-ring ornament-ring--inner"></span>
+        <span class="ornament-axis"></span>
+        <span class="ornament-core"></span>
+        <span class="ornament-glint ornament-glint--left"></span>
+        <span class="ornament-glint ornament-glint--right"></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
