@@ -76,6 +76,7 @@
 @media -moz-pref("wormhole.statusbar.seamless") {
   /* Matched by its status text item, since the toolbar id differs between
      Waterfox versions. Covers the toolbar and its wrapping box. */
+  #browser-bottombox,
   #status-bar,
   toolbar:has(> #status-text),
   vbox:has(> toolbar > #status-text) {
