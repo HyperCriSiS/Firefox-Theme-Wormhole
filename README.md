@@ -53,6 +53,7 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 |---|---|---|
 | Header image | Built-in wormhole | Image painted across all toolbars, anchored top right at its original size. About 3840 x 320 px works best. |
 | New tab background | Built-in space scene | Background of the new tab page. |
+| Only have one image? | None | Fallback: splits one 16:9 image into header (top strip) and new tab background. Two separate images look sharper. |
 | Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
 | Menu color | `#090e18` | Menus, panels, sidebar and address bar. Pick a dark tone from your header image. |
 | Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
@@ -82,6 +83,11 @@ How the parts fit together:
 - **Menu and accent color:** menus, panels, sidebar, address bar and the
   selected tab use these two colors from the settings, so they match your
   images in Firefox and Waterfox, with or without `userChrome.css`.
+- **Only one image (fallback):** if your image tool cannot make the 12:1
+  header, upload a single 16:9 image under "Only have one image?". The theme
+  cuts the top strip into the header and the rest into the new tab
+  background. Two separate images stay sharper on large screens, so prefer
+  them when you can.
 
 ### Create matching images with AI
 
@@ -90,7 +96,8 @@ it into the AI tool of your choice, replace the last line with your idea, and
 it describes both images with the sizes, safe areas and fades this theme
 needs. It also asks the AI for three matching colors: the bottom color (settings
 and, in Waterfox, `--wormhole-statusbar-color`), the menu color and the accent
-color. The settings page shows the same prompt with a copy button.
+color. If your tool can only make one image, it describes a single 16:9
+image for the fallback instead. The settings page shows the same prompt with a copy button.
 
 ## 🧵 Seamless toolbar edge (optional)
 
