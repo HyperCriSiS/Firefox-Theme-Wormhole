@@ -18,9 +18,10 @@ FOR BOTH
 - Same art style, color palette and light direction in both images.
 
 AFTER THE IMAGES
-Tell me the BOTTOM COLOR as a hex value (for example #02050c), checked against the bottom edge of Image 2. I enter it in two places:
-- "Color the new tab page fades into" on the theme's settings page.
-- Waterfox only: the line --wormhole-statusbar-color at the top of userChrome.css, so the status bar below the page has the same color. Firefox has no status bar and does not need this.
+Give me three hex colors taken from the finished images:
+1. BOTTOM COLOR (for example #02050c): checked against the bottom edge of Image 2. I enter it in "Color the new tab page fades into" on the theme's settings page. Waterfox only: also in the line --wormhole-statusbar-color at the top of userChrome.css, so the status bar below the page has the same color. Firefox has no status bar and does not need this.
+2. MENU COLOR (for example #090e18): a dark, calm tone from the header strip for menus, panels and the address bar. Light text must stay easy to read on it (contrast ratio of at least 7:1 with white).
+3. ACCENT COLOR (for example #63f2ff): the most striking light color of the motif, for the selected tab and focused fields. It must stand out clearly on the MENU COLOR.
 
 MY IDEA FOR THE PICTURE:
 [Describe your motif here, for example: a calm aurora over snowy mountains at night, teal and violet.]

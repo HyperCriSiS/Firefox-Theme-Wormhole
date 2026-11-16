@@ -8,18 +8,13 @@
   /* Waterfox only: status bar color. Use the same color as "Color the new
      tab page fades into" on the add-on settings page. */
   --wormhole-statusbar-color: #02050c;
-  --eh-bg: #050811;
-  --eh-bg-2: #090e1a;
-  --eh-panel: rgba(6, 10, 19, .975);
-  --eh-panel-2: rgba(11, 13, 29, .975);
-  --eh-border: rgba(72, 104, 151, .56);
-  --eh-border-hot: rgba(96, 231, 255, .72);
-  --eh-cyan: #62efff;
-  --eh-blue: #398dff;
-  --eh-violet: #8758ff;
-  --eh-magenta: #df55ff;
-  --eh-text: #edf7ff;
-  --eh-muted: #9babc0;
+  /* Menu and accent colors come from the add-on settings through the theme,
+     so menus match custom images without editing this file. */
+  --eh-accent: var(--tab-selected-outline-color, #63f2ff);
+  /* Resolved here, because menus redefine the panel variables themselves. */
+  --eh-panel: var(--panel-background-color);
+  --eh-text: var(--panel-text-color);
+  --eh-border: var(--panel-border-color);
 }
 
 /* FULL CONTINUOUS BROWSER HEADER ---------------------------------------
@@ -89,158 +84,40 @@
   box-shadow: none !important;
 }
 
-/* URL/Search bar --------------------------------------------------------- */
-#urlbar-background,
-#searchbar {
-  background: linear-gradient(105deg, rgba(6, 13, 27, .94), rgba(8, 12, 28, .94) 60%, rgba(17, 9, 32, .92)) !important;
-  border: 1px solid rgba(63, 88, 128, .72) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.025),
-    0 0 14px rgba(49, 124, 255, .035) !important;
-}
+/* Address bar, tabs and sidebar take their colors from the theme. */
 
-#urlbar[focused="true"] > #urlbar-background,
-#urlbar[breakout-extend] > #urlbar-background,
-#searchbar:focus-within {
-  border-color: var(--eh-border-hot) !important;
-  box-shadow:
-    0 0 0 1px rgba(83, 213, 255, .08) inset,
-    0 0 18px rgba(73, 216, 255, .18),
-    0 0 28px rgba(130, 77, 255, .09) !important;
-}
-
-/* Tabs ------------------------------------------------------------------- */
-.tabbrowser-tab[selected] .tab-background {
-  background: linear-gradient(105deg, rgba(13, 21, 38, .97), rgba(17, 16, 43, .96)) !important;
-  box-shadow:
-    inset 0 -2px 0 var(--eh-cyan),
-    inset -1px 0 0 rgba(143, 82, 255, .12),
-    0 0 18px rgba(67, 213, 255, .06) !important;
-}
-
-.tabbrowser-tab:hover:not([selected]) .tab-background {
-  background: linear-gradient(105deg, rgba(20, 29, 50, .66), rgba(23, 19, 48, .58)) !important;
-}
-
-.tabbrowser-tab[selected] .tab-icon-image {
-  filter: drop-shadow(0 0 5px rgba(82, 225, 255, .18));
-}
-
-/* App menu, context menus and panels ------------------------------------ */
-panel,
-menupopup,
-#appMenu-popup,
-#downloadsPanel,
-#unified-extensions-panel,
-#protections-popup,
-#identity-popup,
-#widget-overflow,
-#customizationui-widget-panel {
-  --panel-background: var(--eh-panel) !important;
-  --panel-color: var(--eh-text) !important;
-  /* Current names, used by every menu including the page context menu. */
-  --panel-background-color:
-    radial-gradient(circle at 92% 3%, rgba(121, 74, 255, .08), transparent 27%),
-    radial-gradient(circle at 7% 96%, rgba(57, 187, 255, .06), transparent 31%),
-    linear-gradient(135deg, var(--eh-panel), var(--eh-panel-2)) !important;
-  --panel-text-color: var(--eh-text) !important;
-  --panel-border-color: var(--eh-border) !important;
-  --panel-separator-color: rgba(100, 130, 170, .18) !important;
-}
-
-/* Menus paint on their rounded inner part; painting the menupopup itself
-   leaves a square box around the rounded corners. */
-menupopup::part(content),
-panelview,
-.panel-arrowcontent,
-.panel-subview-body {
-  background:
-    radial-gradient(circle at 92% 3%, rgba(121, 74, 255, .08), transparent 27%),
-    radial-gradient(circle at 7% 96%, rgba(57, 187, 255, .06), transparent 31%),
-    linear-gradient(135deg, var(--eh-panel), var(--eh-panel-2)) !important;
+/* Menus take their colors from the theme. They paint on their rounded
+   inner part; painting the menupopup itself leaves a square box around the
+   rounded corners. */
+menupopup::part(content) {
+  background: var(--eh-panel) !important;
   color: var(--eh-text) !important;
   border-color: var(--eh-border) !important;
 }
 
-menupopup::part(content),
-.panel-arrowcontent {
-  box-shadow:
-    0 12px 38px rgba(0,0,0,.42),
-    0 0 0 1px rgba(255,255,255,.018) inset !important;
+menupopup {
+  --panel-background-color: var(--eh-panel) !important;
+  --panel-text-color: var(--eh-text) !important;
+  --panel-border-color: var(--eh-border) !important;
+  --menu-background-color: var(--eh-panel) !important;
+  --menu-color: var(--eh-text) !important;
+  --menu-border-color: var(--eh-border) !important;
+  --menuitem-hover-background-color: color-mix(in srgb, var(--eh-accent) 18%, transparent) !important;
 }
 
 menu,
 menuitem,
-.subviewbutton,
-.toolbaritem-combined-buttons > .subviewbutton {
+.subviewbutton {
   border-radius: 7px !important;
-}
-
-menu[_moz-menuactive="true"],
-menuitem[_moz-menuactive="true"],
-.subviewbutton:hover,
-.subviewbutton:focus-visible,
-.toolbaritem-combined-buttons > .subviewbutton:hover {
-  background: linear-gradient(100deg, rgba(54, 163, 255, .17), rgba(121, 79, 255, .16), rgba(211, 75, 255, .10)) !important;
-  color: #f7fcff !important;
-  box-shadow: inset 2px 0 0 rgba(101, 238, 255, .58) !important;
-}
-
-menuitem[disabled="true"],
-menu[disabled="true"] {
-  color: rgba(166, 181, 201, .42) !important;
-}
-
-menuseparator,
-toolbarseparator,
-.panel-subview-body > toolbarseparator {
-  border-color: rgba(96, 127, 170, .19) !important;
 }
 
 /* Toolbar buttons -------------------------------------------------------- */
 .toolbarbutton-1:hover > .toolbarbutton-icon,
-.toolbarbutton-1:hover > .toolbarbutton-badge-stack,
-.urlbar-page-action:hover,
-#tracking-protection-icon-container:hover {
-  background-color: rgba(53, 104, 170, .16) !important;
-  box-shadow: 0 0 14px rgba(83, 223, 255, .08) !important;
+.toolbarbutton-1:hover > .toolbarbutton-badge-stack {
+  background-color: color-mix(in srgb, var(--eh-accent) 16%, transparent) !important;
 }
 
 .toolbarbutton-1[open="true"] > .toolbarbutton-icon,
 .toolbarbutton-1[open="true"] > .toolbarbutton-badge-stack {
-  background: linear-gradient(135deg, rgba(47, 173, 255, .18), rgba(132, 75, 255, .17)) !important;
-}
-
-/* Sidebar ---------------------------------------------------------------- */
-#sidebar-box,
-#sidebar-header,
-#sidebar {
-  background: linear-gradient(135deg, #060a13, #080d18 65%, #0b0a1b) !important;
-  color: var(--eh-text) !important;
-  border-color: rgba(54, 78, 111, .64) !important;
-}
-
-#sidebar-header {
-  border-bottom: 1px solid rgba(64, 93, 132, .48) !important;
-}
-
-/* Bookmarks toolbar ------------------------------------------------------ */
-#PersonalToolbar {
-  color: #dce9f7 !important;
-}
-
-#PersonalToolbar .bookmark-item {
-  border-radius: 7px !important;
-}
-
-#PersonalToolbar .bookmark-item:hover {
-  background: linear-gradient(100deg, rgba(57, 180, 255, .13), rgba(127, 77, 255, .11)) !important;
-  color: #ffffff !important;
-  box-shadow: inset 0 0 0 1px rgba(102, 222, 255, .08) !important;
-}
-
-/* Selection -------------------------------------------------------------- */
-::selection {
-  background: rgba(107, 69, 181, .78) !important;
-  color: #ffffff !important;
+  background-color: color-mix(in srgb, var(--eh-accent) 24%, transparent) !important;
 }

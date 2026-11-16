@@ -486,3 +486,47 @@ body {
     animation: none;
   }
 }
+
+/* Custom menu and accent colors from the settings tint the search field. */
+:root.custom-colors .search-shell {
+  background: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+:root.custom-colors .search-shell:focus-within {
+  box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+:root.custom-colors .search-form {
+  background: color-mix(in srgb, var(--menu) 90%, transparent);
+}
+
+:root.custom-colors .search-form::after,
+:root.custom-colors .search-symbol {
+  background: none;
+  filter: none;
+}
+
+:root.custom-colors .search-symbol,
+:root.custom-colors .launch-button {
+  color: var(--accent);
+}
+
+:root.custom-colors .launch-button,
+:root.custom-colors .launch-button:hover,
+:root.custom-colors .launch-button:focus-visible {
+  border-color: var(--accent);
+  background: transparent;
+  box-shadow: none;
+}
+
+:root.custom-colors #search-input {
+  caret-color: var(--accent);
+}
+
+/* The wormhole effects belong to the built-in picture. */
+:root.custom-image .energy-disc,
+:root.custom-image .search-ornament,
+:root.custom-image .particle-layer {
+  display: none;
+}

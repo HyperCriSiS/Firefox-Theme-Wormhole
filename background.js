@@ -46,10 +46,48 @@ const eventHorizonTheme = {
   }
 };
 
+// Mixes two #rrggbb colors; share is the part of b (0 to 1).
+function mix(a, b, share) {
+  const channel = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  return "#" + [0, 1, 2].map(i =>
+    Math.round(channel(a, i) * (1 - share) + channel(b, i) * share).toString(16).padStart(2, "0")
+  ).join("");
+}
+
+// Menu and accent color from the options page drive every themed surface
+// that is not the header image, so menus match the user's own images.
 async function applyTheme() {
-  const { headerImage } = await browser.storage.local.get("headerImage");
+  const { headerImage, menuColor, accentColor } =
+    await browser.storage.local.get(["headerImage", "menuColor", "accentColor"]);
   const images = { theme_frame: headerImage || eventHorizonTheme.images.theme_frame };
-  browser.theme.update({ ...eventHorizonTheme, images }).catch(console.error);
+  const colors = { ...eventHorizonTheme.colors };
+  if (menuColor) {
+    Object.assign(colors, {
+      frame: menuColor,
+      frame_inactive: menuColor,
+      popup: menuColor,
+      popup_border: mix(menuColor, "#ffffff", .15),
+      popup_highlight: mix(menuColor, "#ffffff", .08),
+      sidebar: menuColor,
+      sidebar_border: mix(menuColor, "#ffffff", .1),
+      sidebar_highlight: mix(menuColor, "#ffffff", .08),
+      toolbar_field: menuColor + "c7",
+      toolbar_field_focus: menuColor + "e0",
+      toolbar_field_border: mix(menuColor, "#ffffff", .18),
+      ntp_card_background: menuColor
+    });
+  }
+  if (accentColor) {
+    Object.assign(colors, {
+      tab_line: accentColor,
+      tab_loading: accentColor,
+      toolbar_field_border_focus: accentColor,
+      icons_attention: accentColor,
+      popup_highlight_text: accentColor,
+      sidebar_highlight_text: accentColor
+    });
+  }
+  browser.theme.update({ ...eventHorizonTheme, images, colors }).catch(console.error);
 }
 
 // Optional: show the Wormhole page instead of the home page (new windows,
@@ -62,7 +100,7 @@ browser.tabs.onUpdated.addListener(async (tabId, { url }) => {
 
 applyTheme();
 browser.storage.onChanged.addListener(changes => {
-  if ("headerImage" in changes) applyTheme();
+  if (["headerImage", "menuColor", "accentColor"].some(key => key in changes)) applyTheme();
 });
 browser.runtime.onInstalled.addListener(applyTheme);
 browser.runtime.onStartup.addListener(applyTheme);
