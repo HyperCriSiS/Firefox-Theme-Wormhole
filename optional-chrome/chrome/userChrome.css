@@ -20,15 +20,10 @@
 }
 
 /* FULL CONTINUOUS BROWSER HEADER ---------------------------------------
-   v0.4.4: one single artwork is painted on the complete navigator toolbox.
+   The theme paints the header image (built-in or chosen in the settings).
    Every row above it is transparent, including the separate title bar. */
 
 #navigator-toolbox {
-  background-color: #02050c !important;
-  background-image: url("event-horizon-header.png") !important;
-  background-repeat: no-repeat !important;
-  background-position: top right !important;
-  background-size: auto !important;
   border: 0 !important;
   box-shadow: none !important;
 }
