@@ -90,7 +90,7 @@ async function applyTheme() {
   browser.theme.update({ ...eventHorizonTheme, images, colors }).catch(console.error);
 }
 
-// Optional: show the Wormhole page instead of the home page (new windows,
+// Optional: show the new tab page instead of the home page (new windows,
 // Home button). Off by default; enabled on the options page.
 browser.tabs.onUpdated.addListener(async (tabId, { url }) => {
   if (url !== "about:home") return;

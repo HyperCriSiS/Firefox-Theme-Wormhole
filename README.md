@@ -27,7 +27,7 @@ cannot paint behind them.
 - New tab page that continues the header image and follows toolbar height changes.
 - Search on the new tab page uses your default search engine.
 - Custom header and new tab images from the settings page.
-- Optional: show the Wormhole page in new windows and for the Home button.
+- Optional: use the new tab page for new windows and the Home button too.
 - Optional `userChrome.css` that also removes the last line between toolbars and page.
 
 ## 📦 Installation
@@ -58,7 +58,7 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 | Menu color | `#090e18` | Menus, panels, sidebar and address bar. Pick a dark tone from your header image. |
 | Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
-| Show the Wormhole page in new windows | Off | Replaces the home page in new windows and for the Home button. |
+| Also use this new tab page for new windows and the Home button | Off | Replaces the home page in new windows and for the Home button. |
 
 ## 🎨 Custom images
 
