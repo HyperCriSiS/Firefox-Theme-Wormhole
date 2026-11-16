@@ -9,7 +9,10 @@
     fieldset { margin-bottom: 16px; border-radius: 6px; }
     img { display: block; max-width: 100%; max-height: 120px; margin: 8px 0; }
     small { display: block; opacity: .7; margin-top: 6px; }
-    label { display: block; margin-bottom: 8px; }  </style>
+    label { display: block; margin-bottom: 8px; }
+    section { max-width: 760px; margin-top: 24px; line-height: 1.45; }
+    textarea { width: 100%; height: 220px; font: 12px ui-monospace, monospace; }
+  </style>
 </head>
 <body>
   <fieldset data-key="headerImage" data-default="images/theme_frame.png">
@@ -27,7 +30,26 @@
   </fieldset>
   <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
   <label><input type="checkbox" id="homepage"> Also show the Wormhole page in new windows and for the Home button</label>
-  <p><small>The add-on cannot remove every edge on its own. The optional userChrome.css also removes the line between toolbars and page and styles menus to match: <a href="https://github.com/HyperCriSiS/Firefox-Theme-Wormhole#-seamless-toolbar-edge-optional" target="_blank" rel="noreferrer">setup guide</a>.</small></p>
+  <section>
+    <h2>How your images fit together</h2>
+    <ul>
+      <li><b>Header image:</b> painted behind tabs and toolbars, anchored top right at its original size. The new tab page continues the same image below the toolbars, so they always line up. Use about 3840 × 320 px and keep the main motif on the right.</li>
+      <li><b>Transition:</b> the continuation fades into the new tab background. It looks seamless when the bottom of the header and the top of the background share colors.</li>
+      <li><b>New tab background:</b> fills the page, cropped from the center. Its bottom fades into very dark blue (#02050c), the color of the Waterfox status bar.</li>
+    </ul>
+    <p>Your images are stored only in this browser and never uploaded.</p>
+  </section>
+  <section>
+    <h2>Create matching images with AI</h2>
+    <p>Copy this prompt into an AI image tool and replace the last line with your idea. It asks for both images with the sizes and fades this theme needs.</p>
+    <textarea id="prompt" readonly></textarea>
+    <button type="button" id="copy-prompt">Copy prompt</button>
+  </section>
+  <section>
+    <h2>Remove the last edges (optional)</h2>
+    <p>Add-ons cannot change browser files, so this step is manual. The optional userChrome.css removes the line between toolbars and page, matches menus to the theme and, in Waterfox, removes the edge above the status bar.</p>
+  </section>
+  <p><a href="https://github.com/HyperCriSiS/Firefox-Theme-Wormhole#readme" target="_blank" rel="noreferrer">Full documentation and userChrome.css setup on GitHub</a></p>
   <script src="options.js"></script>
 </body>
 </html>

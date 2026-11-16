@@ -56,7 +56,39 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
 | Show the Wormhole page in new windows | Off | Replaces the home page in new windows and for the Home button. |
 
+## 🎨 Custom images
+
+Both images can be replaced on the settings page. Your files stay in the
+add-on's local storage and are never uploaded.
+
+How the parts fit together:
+
+- **Header image:** painted behind tabs and toolbars, anchored top right at its
+  original size. The new tab page shows the rest of the same image directly
+  below the toolbars, so header and page line up with any image. About
+  3840 x 320 px covers wide screens and the bookmarks toolbar.
+- **Transition:** the header continuation fades out into the new tab
+  background. It looks seamless when the bottom of the header image and the
+  top of the background share colors.
+- **New tab background:** fills the page and is cropped to the window
+  (centered). Its last 48 px fade into `#02050c`, the color of the Waterfox
+  status bar when `userChrome.css` is installed, so the bottom never shows an
+  edge.
+
+### Create matching images with AI
+
+[image-prompt.txt](image-prompt.txt) is a prompt for image generators. Paste
+it into the AI tool of your choice, replace the last line with your idea, and
+it describes both images with the sizes, safe areas and fades this theme
+needs. The settings page shows the same prompt with a copy button.
+
 ## 🧵 Seamless toolbar edge (optional)
+
+Add-ons cannot change files in the browser profile, so this part is always a
+manual step, also when the theme comes from an add-on store. Download
+`wormhole-userchrome-<version>.zip` from the
+[latest release](https://github.com/HyperCriSiS/Firefox-Theme-Wormhole/releases/latest)
+or take the folder from a checkout.
 
 Firefox draws a thin line between the toolbars and the page that a theme
 cannot remove. `optional-chrome/chrome/userChrome.css` removes it and styles
@@ -64,7 +96,7 @@ menus and panels to match.
 
 1. Set `toolkit.legacyUserProfileCustomizations.stylesheets` to `true` in `about:config`.
 2. Open `about:support` and click **Open Folder** next to **Profile Folder**.
-3. Copy the `chrome` folder from `optional-chrome` into the profile folder.
+3. Create a folder named `chrome` in the profile folder if it does not exist and put `userChrome.css` into it.
 4. Restart the browser.
 
 In Waterfox it also removes the edge above the status bar at the bottom and

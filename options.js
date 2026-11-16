@@ -30,3 +30,9 @@ for (const box of document.querySelectorAll("fieldset")) {
     show({});
   });
 }
+
+const prompt = document.getElementById("prompt");
+fetch("image-prompt.txt").then(r => r.text()).then(text => { prompt.value = text; });
+document.getElementById("copy-prompt").addEventListener("click", () => {
+  navigator.clipboard.writeText(prompt.value);
+});
