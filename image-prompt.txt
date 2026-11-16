@@ -9,6 +9,7 @@ IMAGE 1: HEADER STRIP
 IMAGE 2: NEW TAB WALLPAPER
 - Size 3840 x 2160 px (aspect ratio 16:9). If you cannot make that size, make it 16:9 and I will scale it.
 - It fills the page below the header. Screens with other aspect ratios crop it a little on the sides or top and bottom, so keep the main motif inside the center 80 %.
+- A browser sidebar may cover the left edge, and the page fades into it there. Keep the left 10 % calm and dark, without important details or objects that would be cut off.
 - The top edge must continue the bottom of Image 1 seamlessly: same colors and lighting, dark near the top.
 - A search field sits centered near the bottom, about 8 % above the bottom edge. Keep that area calm.
 - The last 5 % at the bottom fade into one solid color (the BOTTOM COLOR). Choose it from the image itself, usually its darkest tone, so the fade looks natural.

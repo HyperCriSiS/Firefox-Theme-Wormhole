@@ -47,6 +47,18 @@ body {
   mask-image: linear-gradient(to bottom, #000 40%, transparent);
 }
 
+/* With a sidebar on the left, the page fades into its color (the theme frame
+   color), so there is no hard edge between sidebar and page. */
+.has-sidebar body::before {
+  content: "";
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 96px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to right, var(--frame, #02050c), transparent);
+}
+
 .scene {
   z-index: -4;
   background-image: var(--newtab-image, url("images/newtab-space.jpg"));
