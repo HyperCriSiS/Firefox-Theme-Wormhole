@@ -85,15 +85,21 @@
   box-shadow: none !important;
 }
 
-/* Address bar, tabs and sidebar take their colors from the theme. The
-   header image would otherwise show through the top of the sidebar and end
-   in a visible edge, so the sidebar gets one solid color. */
+/* The theme picture fills the whole window, so the sidebar is transparent
+   and the picture runs on behind it. */
 #browser,
 #sidebar-container,
 #sidebar-launcher-splitter,
 sidebar-main,
-#sidebar-box {
-  background: var(--eh-frame) !important;
+#sidebar-box,
+#sidebar,
+#tabbrowser-tabbox,
+#tabbrowser-tabpanels {
+  background: transparent !important;
+  --sidebar-background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
 }
 
 /* Menus take their colors from the theme. They paint on their rounded
