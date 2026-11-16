@@ -120,6 +120,11 @@ it never needs editing for custom images, except the Waterfox status bar color.
 In Waterfox it also removes the edge above the status bar at the bottom and
 gives the bar the color the new tab page fades into.
 
+Waterfox browser styles (Settings, Appearance): the theme works with Nova,
+Proton and Photon. Proton and Photon give the most seamless picture. Nova
+keeps its rounded edges around the page by design, so the picture shows a
+soft frame there.
+
 > [!NOTE]
 > `userChrome.css` is not an official API and may need adjustments after major browser updates.
 
