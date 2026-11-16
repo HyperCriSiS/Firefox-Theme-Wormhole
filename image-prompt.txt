@@ -3,7 +3,7 @@ Create two images that belong together for a browser theme. They are shown on to
 IMAGE 1: HEADER STRIP
 - Size 3840 x 320 px (aspect ratio 12:1). If you cannot make that size, make it as wide as possible at 12:1 and I will scale it.
 - It sits behind the browser tabs and toolbars and is anchored to the top right corner. Narrow windows cut it off on the left, so put the main motif in the right third.
-- The top 90 px sit behind tabs, buttons and the address bar. Keep that area calm and dark enough for light text and icons; no bright spots or fine detail there.
+- The top 90 px sit behind tabs, buttons and the address bar. Keep them medium dark so white text and icons stay readable, but not empty: color, soft gradients and parts of the motif (sky, clouds, glow, leaves) may reach into them, and on the right the motif may go all the way to the top. Avoid only bright spots and busy detail behind the left half, where the tab titles sit.
 - The bottom 230 px continue directly onto the page below, so they must flow into the top edge of Image 2: same colors, same lighting, no frame, no border, no hard horizontal line anywhere.
 
 IMAGE 2: NEW TAB WALLPAPER
