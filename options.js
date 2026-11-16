@@ -8,7 +8,7 @@ for (const box of document.querySelectorAll("input[type=checkbox], input[type=co
   box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box[prop] }));
 }
 
-for (const box of document.querySelectorAll("fieldset")) {
+for (const box of document.querySelectorAll("fieldset[data-key]")) {
   const { key, default: fallback } = box.dataset;
   const preview = box.querySelector("img");
   const show = stored => { preview.src = stored[key] || fallback; };
@@ -32,6 +32,29 @@ for (const box of document.querySelectorAll("fieldset")) {
     show({});
   });
 }
+
+// Fallback: split one image into header (top 12:1 strip) and new tab
+// background (the rest), scaled to the 3840 px header width.
+document.querySelector("#split input").addEventListener("change", async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const image = await createImageBitmap(file);
+  const width = 3840;
+  const scale = width / image.width;
+  const strip = image.width / 12;
+  const part = (top, height, type) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = Math.round(height * scale);
+    canvas.getContext("2d").drawImage(image, 0, top, image.width, height, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL(type, .92);
+  };
+  await browser.storage.local.set({
+    headerImage: part(0, strip, "image/png"),
+    newtabImage: part(strip, image.height - strip, "image/jpeg")
+  });
+  location.reload();
+});
 
 const prompt = document.getElementById("prompt");
 fetch("image-prompt.txt").then(r => r.text()).then(text => { prompt.value = text; });

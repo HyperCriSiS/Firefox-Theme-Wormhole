@@ -17,6 +17,9 @@ FOR BOTH
 - No text, no logos, no watermarks, no UI elements, no frames.
 - Same art style, color palette and light direction in both images.
 
+IF YOU CAN ONLY MAKE ONE IMAGE
+Two separate images look sharper, so use this only as a fallback. Make one 16:9 image instead, which the theme splits itself: the top 15 % becomes the header strip, the rest the wallpaper. Keep the top 4 % calm and dark (tabs and toolbars sit there), put the main motif in the right half, keep the area about 8 % above the bottom calm and let the last 5 % fade into the BOTTOM COLOR.
+
 AFTER THE IMAGES
 Give me three hex colors taken from the finished images:
 1. BOTTOM COLOR (for example #02050c): checked against the bottom edge of Image 2. I enter it in "Color the new tab page fades into" on the theme's settings page. Waterfox only: also in the line --wormhole-statusbar-color at the top of userChrome.css, so the status bar below the page has the same color. Firefox has no status bar and does not need this.

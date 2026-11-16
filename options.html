@@ -28,6 +28,11 @@
     <input type="file" accept="image/*">
     <button type="button">Reset</button>
   </fieldset>
+  <fieldset id="split">
+    <legend>Only have one image? (fallback)</legend>
+    <input type="file" accept="image/*">
+    <small>Splits one wide image (16:9 or wider) into both images above: the top strip becomes the header, the rest the new tab background, so they always line up. Two separate images look sharper; use this only when your image tool cannot make the 12:1 header.</small>
+  </fieldset>
   <label><input type="color" id="bottomColor" value="#02050c"> Color the new tab page fades into at the bottom</label>
   <label><input type="color" id="menuColor" value="#090e18"> Menu color (menus, panels, sidebar, address bar)</label>
   <label><input type="color" id="accentColor" value="#63f2ff"> Accent color (selected tab, focused address bar, highlighted menu text)</label>
