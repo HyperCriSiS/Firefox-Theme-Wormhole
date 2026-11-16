@@ -121,6 +121,12 @@ menuitem,
   border-radius: 7px !important;
 }
 
+/* Firefox paints the hovered item in the system hover color; use the theme
+   accent for the whole row instead. */
+menupopup :is(menu, menuitem)[_moz-menuactive]:not([disabled]) {
+  background-color: var(--menuitem-hover-background-color) !important;
+}
+
 /* Toolbar buttons -------------------------------------------------------- */
 .toolbarbutton-1:hover > .toolbarbutton-icon,
 .toolbarbutton-1:hover > .toolbarbutton-badge-stack {
