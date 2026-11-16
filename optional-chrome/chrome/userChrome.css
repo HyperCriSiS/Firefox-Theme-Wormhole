@@ -88,6 +88,9 @@
 /* Address bar, tabs and sidebar take their colors from the theme. The
    header image would otherwise show through the top of the sidebar and end
    in a visible edge, so the sidebar gets one solid color. */
+#browser,
+#sidebar-container,
+#sidebar-launcher-splitter,
 sidebar-main,
 #sidebar-box {
   background: var(--eh-frame) !important;
