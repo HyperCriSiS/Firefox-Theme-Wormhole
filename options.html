@@ -28,6 +28,7 @@
     <input type="file" accept="image/*">
     <button type="button">Reset</button>
   </fieldset>
+  <label><input type="color" id="bottomColor" value="#02050c"> Color the new tab page fades into at the bottom</label>
   <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
   <label><input type="checkbox" id="homepage"> Also show the Wormhole page in new windows and for the Home button</label>
   <section>
@@ -35,7 +36,7 @@
     <ul>
       <li><b>Header image:</b> painted behind tabs and toolbars, anchored top right at its original size. The new tab page continues the same image below the toolbars, so they always line up. Use about 3840 × 320 px and keep the main motif on the right.</li>
       <li><b>Transition:</b> the continuation fades into the new tab background. It looks seamless when the bottom of the header and the top of the background share colors.</li>
-      <li><b>New tab background:</b> fills the page, cropped from the center. Its bottom fades into very dark blue (#02050c), the color of the Waterfox status bar.</li>
+      <li><b>New tab background:</b> fills the page, cropped from the center. Its bottom fades into the color chosen above. Waterfox only: set the same color for the status bar in userChrome.css (see below).</li>
     </ul>
     <p>Your images are stored only in this browser and never uploaded.</p>
   </section>
@@ -47,7 +48,7 @@
   </section>
   <section>
     <h2>Remove the last edges (optional)</h2>
-    <p>Add-ons cannot change browser files, so this step is manual. The optional userChrome.css removes the line between toolbars and page, matches menus to the theme and, in Waterfox, removes the edge above the status bar.</p>
+    <p>Add-ons cannot change browser files, so this step is manual. The optional userChrome.css removes the line between toolbars and page, matches menus to the theme and, in Waterfox, removes the edge above the status bar. Waterfox only: the status bar color is the <code>--wormhole-statusbar-color</code> line at the top of userChrome.css; set it to the same color as the fade above.</p>
   </section>
   <p><a href="https://github.com/HyperCriSiS/Firefox-Theme-Wormhole#readme" target="_blank" rel="noreferrer">Full documentation and userChrome.css setup on GitHub</a></p>
   <script src="options.js"></script>

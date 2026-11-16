@@ -46,11 +46,12 @@ updateChromeHeight();
 window.addEventListener("resize", updateChromeHeight);
 
 // Custom images chosen on the options page.
-browser.storage.local.get(["headerImage", "newtabImage", "seamless"]).then(({ headerImage, newtabImage, seamless }) => {
+browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColor"]).then(({ headerImage, newtabImage, seamless, bottomColor }) => {
   const root = document.documentElement.style;
   if (seamless === false) document.querySelector(".header-continuation").hidden = true;
   if (headerImage) root.setProperty("--header-image", `url("${headerImage}")`);
   if (newtabImage) root.setProperty("--newtab-image", `url("${newtabImage}")`);
+  if (bottomColor) root.setProperty("--bottom-color", bottomColor);
 });
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");

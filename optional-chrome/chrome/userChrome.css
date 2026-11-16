@@ -5,6 +5,9 @@
 */
 
 :root {
+  /* Waterfox only: status bar color. Use the same color as "Color the new
+     tab page fades into" on the add-on settings page. */
+  --wormhole-statusbar-color: #02050c;
   --eh-bg: #050811;
   --eh-bg-2: #090e1a;
   --eh-panel: rgba(6, 10, 19, .975);
@@ -69,7 +72,7 @@
    Same color as the bottom of the new tab page, so the page fades into it. */
 #browser-bottombox,
 #status-bar {
-  background-color: #02050c !important;
+  background-color: var(--wormhole-statusbar-color) !important;
   background-image: none !important;
   border: 0 !important;
   outline: 0 !important;

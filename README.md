@@ -53,6 +53,7 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 |---|---|---|
 | Header image | Built-in wormhole | Image painted across all toolbars, anchored top right at its original size. About 3840 x 320 px works best. |
 | New tab background | Built-in space scene | Background of the new tab page. |
+| Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
 | Show the Wormhole page in new windows | Off | Replaces the home page in new windows and for the Home button. |
 
@@ -71,16 +72,19 @@ How the parts fit together:
   background. It looks seamless when the bottom of the header image and the
   top of the background share colors.
 - **New tab background:** fills the page and is cropped to the window
-  (centered). Its last 48 px fade into `#02050c`, the color of the Waterfox
-  status bar when `userChrome.css` is installed, so the bottom never shows an
-  edge.
+  (centered). Its last 48 px fade into the bottom color from the settings
+  (default `#02050c`), so the bottom never shows an edge.
+- **Waterfox status bar (Waterfox only):** with `userChrome.css` installed, the
+  bar below the page takes `--wormhole-statusbar-color` from the top of that
+  file. Set it to the same bottom color. Firefox has no such bar.
 
 ### Create matching images with AI
 
 [image-prompt.txt](image-prompt.txt) is a prompt for image generators. Paste
 it into the AI tool of your choice, replace the last line with your idea, and
 it describes both images with the sizes, safe areas and fades this theme
-needs. The settings page shows the same prompt with a copy button.
+needs. It also asks the AI for the matching bottom color, which goes into the
+settings and, in Waterfox, into `--wormhole-statusbar-color`. The settings page shows the same prompt with a copy button.
 
 ## 🧵 Seamless toolbar edge (optional)
 

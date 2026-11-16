@@ -1,9 +1,11 @@
-// Checkboxes are stored under their id; the HTML "checked" attribute is the default.
-for (const box of document.querySelectorAll("input[type=checkbox]")) {
+// Checkboxes and the color field are stored under their id; the HTML
+// "checked" or "value" attribute is the default.
+for (const box of document.querySelectorAll("input[type=checkbox], input[type=color]")) {
+  const prop = box.type === "checkbox" ? "checked" : "value";
   browser.storage.local.get(box.id).then(stored => {
-    box.checked = stored[box.id] ?? box.defaultChecked;
+    if (box.id in stored) box[prop] = stored[box.id];
   });
-  box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box.checked }));
+  box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box[prop] }));
 }
 
 for (const box of document.querySelectorAll("fieldset")) {
