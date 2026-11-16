@@ -46,8 +46,15 @@ updateChromeHeight();
 window.addEventListener("resize", updateChromeHeight);
 
 // Custom images chosen on the options page.
-browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColor"]).then(({ headerImage, newtabImage, seamless, bottomColor }) => {
+browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColor", "menuColor", "accentColor"]).then(({ headerImage, newtabImage, seamless, bottomColor, menuColor, accentColor }) => {
   const root = document.documentElement.style;
+  const classes = document.documentElement.classList;
+  if (newtabImage) classes.add("custom-image");
+  if (menuColor || accentColor) {
+    classes.add("custom-colors");
+    root.setProperty("--menu", menuColor || "#090e18");
+    root.setProperty("--accent", accentColor || "#63f2ff");
+  }
   if (seamless === false) document.querySelector(".header-continuation").hidden = true;
   if (headerImage) root.setProperty("--header-image", `url("${headerImage}")`);
   if (newtabImage) root.setProperty("--newtab-image", `url("${newtabImage}")`);

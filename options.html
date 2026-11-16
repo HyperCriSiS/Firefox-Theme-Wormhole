@@ -29,6 +29,8 @@
     <button type="button">Reset</button>
   </fieldset>
   <label><input type="color" id="bottomColor" value="#02050c"> Color the new tab page fades into at the bottom</label>
+  <label><input type="color" id="menuColor" value="#090e18"> Menu color (menus, panels, sidebar, address bar)</label>
+  <label><input type="color" id="accentColor" value="#63f2ff"> Accent color (selected tab, focused address bar, highlighted menu text)</label>
   <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
   <label><input type="checkbox" id="homepage"> Also show the Wormhole page in new windows and for the Home button</label>
   <section>
@@ -37,6 +39,7 @@
       <li><b>Header image:</b> painted behind tabs and toolbars, anchored top right at its original size. The new tab page continues the same image below the toolbars, so they always line up. Use about 3840 × 320 px and keep the main motif on the right.</li>
       <li><b>Transition:</b> the continuation fades into the new tab background. It looks seamless when the bottom of the header and the top of the background share colors.</li>
       <li><b>New tab background:</b> fills the page, cropped from the center. Its bottom fades into the color chosen above. Waterfox only: set the same color for the status bar in userChrome.css (see below).</li>
+      <li><b>Menu and accent color:</b> pick them to match your images, so menus and the address bar fit the picture. The AI prompt below suggests both.</li>
     </ul>
     <p>Your images are stored only in this browser and never uploaded.</p>
   </section>

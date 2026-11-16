@@ -54,6 +54,8 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 | Header image | Built-in wormhole | Image painted across all toolbars, anchored top right at its original size. About 3840 x 320 px works best. |
 | New tab background | Built-in space scene | Background of the new tab page. |
 | Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
+| Menu color | `#090e18` | Menus, panels, sidebar and address bar. Pick a dark tone from your header image. |
+| Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
 | Show the Wormhole page in new windows | Off | Replaces the home page in new windows and for the Home button. |
 
@@ -77,14 +79,18 @@ How the parts fit together:
 - **Waterfox status bar (Waterfox only):** with `userChrome.css` installed, the
   bar below the page takes `--wormhole-statusbar-color` from the top of that
   file. Set it to the same bottom color. Firefox has no such bar.
+- **Menu and accent color:** menus, panels, sidebar, address bar and the
+  selected tab use these two colors from the settings, so they match your
+  images in Firefox and Waterfox, with or without `userChrome.css`.
 
 ### Create matching images with AI
 
 [image-prompt.txt](image-prompt.txt) is a prompt for image generators. Paste
 it into the AI tool of your choice, replace the last line with your idea, and
 it describes both images with the sizes, safe areas and fades this theme
-needs. It also asks the AI for the matching bottom color, which goes into the
-settings and, in Waterfox, into `--wormhole-statusbar-color`. The settings page shows the same prompt with a copy button.
+needs. It also asks the AI for three matching colors: the bottom color (settings
+and, in Waterfox, `--wormhole-statusbar-color`), the menu color and the accent
+color. The settings page shows the same prompt with a copy button.
 
 ## 🧵 Seamless toolbar edge (optional)
 
@@ -95,8 +101,9 @@ manual step, also when the theme comes from an add-on store. Download
 or take the folder from a checkout.
 
 Firefox draws a thin line between the toolbars and the page that a theme
-cannot remove. `optional-chrome/chrome/userChrome.css` removes it and styles
-menus and panels to match.
+cannot remove. `optional-chrome/chrome/userChrome.css` removes it and makes
+all toolbars transparent. It takes menu and accent colors from the theme, so
+it never needs editing for custom images, except the Waterfox status bar color.
 
 1. Set `toolkit.legacyUserProfileCustomizations.stylesheets` to `true` in `about:config`.
 2. Open `about:support` and click **Open Folder** next to **Profile Folder**.
