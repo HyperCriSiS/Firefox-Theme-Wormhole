@@ -71,16 +71,14 @@
 }
 
 /* Waterfox status bar at the bottom. No effect in Firefox, which has none.
-   Opt-in: create the boolean pref wormhole.statusbar.seamless = true in
-   about:config. */
-@media -moz-pref("wormhole.statusbar.seamless") {
-  #status-bar {
-    background-color: #02050c !important;
-    background-image: none !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
+   Same color as the bottom of the new tab page, so the page fades into it. */
+#browser-bottombox,
+#status-bar {
+  background-color: #02050c !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 #navigator-toolbox,
@@ -142,6 +140,12 @@ menupopup,
 #customizationui-widget-panel {
   --panel-background: var(--eh-panel) !important;
   --panel-color: var(--eh-text) !important;
+  /* Current names, used by every menu including the page context menu. */
+  --panel-background-color:
+    radial-gradient(circle at 92% 3%, rgba(121, 74, 255, .08), transparent 27%),
+    radial-gradient(circle at 7% 96%, rgba(57, 187, 255, .06), transparent 31%),
+    linear-gradient(135deg, var(--eh-panel), var(--eh-panel-2)) !important;
+  --panel-text-color: var(--eh-text) !important;
   --panel-border-color: var(--eh-border) !important;
   --panel-separator-color: rgba(100, 130, 170, .18) !important;
 }
