@@ -71,21 +71,14 @@
 }
 
 /* Waterfox status bar at the bottom. No effect in Firefox, which has none.
-   Opt-in: create the boolean pref wormhole.statusbar.seamless = true in
-   about:config. */
-@media -moz-pref("wormhole.statusbar.seamless") {
-  /* Matched by its status text item, since the toolbar id differs between
-     Waterfox versions. Covers the toolbar and its wrapping box. */
-  #browser-bottombox,
-  #status-bar,
-  toolbar:has(> #status-text),
-  vbox:has(> toolbar > #status-text) {
-    background-color: #02050c !important;
-    background-image: none !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
+   Same color as the bottom of the new tab page, so the page fades into it. */
+#browser-bottombox,
+#status-bar {
+  background-color: #02050c !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 #navigator-toolbox,
