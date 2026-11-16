@@ -139,6 +139,20 @@ soft frame there.
 
 Report problems in the [issue tracker](https://github.com/HyperCriSiS/Firefox-Theme-Wormhole/issues).
 
+## 🧩 More add-ons
+
+Like Wormhole? These add-ons are by the same author.
+
+**Firefox**
+
+- [Sprachverstand](https://addons.mozilla.org/firefox/addon/sprachverstand/): removes gender language from websites.
+
+**Thunderbird** (Proton Mail and more)
+
+- [All Mail Buddy](https://github.com/Broton-Your-bro-for-Proton/All-Mail-Buddy): shows the real folder of every message in Proton Mail Bridge's All Mail folder and makes delete, move, archive and junk act on it.
+- [Alias Buddy](https://github.com/Broton-Your-bro-for-Proton/Alias-Buddy): send as your SimpleLogin alias without handling reverse aliases, with a guard against leaking your real address.
+- [Sieve Buddy](https://github.com/Broton-Your-bro-for-Proton/Sieve-Buddy): Sieve filter manager for Proton Mail and any ManageSieve server, with rules from mails and a simulator.
+
 ## 📄 License
 
 GNU Affero General Public License v3.0 only. See [LICENSE](LICENSE).
