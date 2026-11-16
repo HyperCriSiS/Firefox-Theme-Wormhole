@@ -15,6 +15,7 @@
   --eh-panel: var(--panel-background-color);
   --eh-text: var(--panel-text-color);
   --eh-border: var(--panel-border-color);
+  --eh-frame: var(--lwt-accent-color);
 }
 
 /* FULL CONTINUOUS BROWSER HEADER ---------------------------------------
@@ -84,7 +85,13 @@
   box-shadow: none !important;
 }
 
-/* Address bar, tabs and sidebar take their colors from the theme. */
+/* Address bar, tabs and sidebar take their colors from the theme. The
+   header image would otherwise show through the top of the sidebar and end
+   in a visible edge, so the sidebar gets one solid color. */
+sidebar-main,
+#sidebar-box {
+  background: var(--eh-frame) !important;
+}
 
 /* Menus take their colors from the theme. They paint on their rounded
    inner part; painting the menupopup itself leaves a square box around the
