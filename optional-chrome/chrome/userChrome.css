@@ -5,6 +5,9 @@
 */
 
 :root {
+  /* Waterfox only: status bar color. Use the same color as "Color the new
+     tab page fades into" on the add-on settings page. */
+  --wormhole-statusbar-color: #02050c;
   --eh-bg: #050811;
   --eh-bg-2: #090e1a;
   --eh-panel: rgba(6, 10, 19, .975);
@@ -20,15 +23,10 @@
 }
 
 /* FULL CONTINUOUS BROWSER HEADER ---------------------------------------
-   v0.4.4: one single artwork is painted on the complete navigator toolbox.
+   The theme paints the header image (built-in or chosen in the settings).
    Every row above it is transparent, including the separate title bar. */
 
 #navigator-toolbox {
-  background-color: #02050c !important;
-  background-image: url("event-horizon-header.png") !important;
-  background-repeat: no-repeat !important;
-  background-position: top right !important;
-  background-size: auto !important;
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -74,7 +72,7 @@
    Same color as the bottom of the new tab page, so the page fades into it. */
 #browser-bottombox,
 #status-bar {
-  background-color: #02050c !important;
+  background-color: var(--wormhole-statusbar-color) !important;
   background-image: none !important;
   border: 0 !important;
   outline: 0 !important;
