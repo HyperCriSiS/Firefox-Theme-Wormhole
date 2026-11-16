@@ -121,10 +121,15 @@ menuitem,
   border-radius: 7px !important;
 }
 
-/* Firefox paints the hovered item in the system hover color; use the theme
-   accent for the whole row instead. */
-menupopup :is(menu, menuitem)[_moz-menuactive]:not([disabled]) {
-  background-color: var(--menuitem-hover-background-color) !important;
+/* Hovered menu items: accent tint, a glow from the left and an accent bar.
+   Only background-color and box-shadow, because built-in items draw their
+   icon as background-image and a background shorthand would hide it. */
+menupopup :is(menu, menuitem)[_moz-menuactive]:not([disabled]),
+.subviewbutton:is(:hover, :focus-visible) {
+  background-color: color-mix(in srgb, var(--eh-accent) 12%, transparent) !important;
+  box-shadow:
+    inset 2px 0 0 color-mix(in srgb, var(--eh-accent) 75%, transparent),
+    inset 90px 0 60px -60px color-mix(in srgb, var(--eh-accent) 28%, transparent) !important;
 }
 
 /* Toolbar buttons -------------------------------------------------------- */
