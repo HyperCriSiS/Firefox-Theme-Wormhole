@@ -41,6 +41,10 @@ function updateChromeHeight() {
     ? window.mozInnerScreenY - Math.max(window.screenY, screen.availTop)
     : window.outerHeight - window.innerHeight;
   document.documentElement.style.setProperty("--chrome-height", `${Math.max(0, chrome)}px`);
+  // Something (the sidebar) sits between the window edge and the page.
+  if ("mozInnerScreenX" in window) {
+    document.documentElement.classList.toggle("has-sidebar", window.mozInnerScreenX - Math.max(window.screenX, screen.availLeft) > 16);
+  }
 }
 updateChromeHeight();
 window.addEventListener("resize", updateChromeHeight);
@@ -50,6 +54,7 @@ browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColo
   const root = document.documentElement.style;
   const classes = document.documentElement.classList;
   if (newtabImage) classes.add("custom-image");
+  if (menuColor) root.setProperty("--frame", menuColor);
   if (menuColor || accentColor) {
     classes.add("custom-colors");
     root.setProperty("--menu", menuColor || "#090e18");
