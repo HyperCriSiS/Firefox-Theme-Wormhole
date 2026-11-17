@@ -53,10 +53,16 @@ body {
   content: "";
   position: fixed;
   inset: 0 auto 0 0;
-  width: 96px;
+  width: 64px;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(to right, var(--frame, #02050c), transparent);
+  /* Eased stops: a linear fade reads as a solid band with an edge at its end. */
+  background: linear-gradient(to right,
+    var(--frame, #02050c),
+    color-mix(in srgb, var(--frame, #02050c) 55%, transparent) 25%,
+    color-mix(in srgb, var(--frame, #02050c) 22%, transparent) 55%,
+    color-mix(in srgb, var(--frame, #02050c) 6%, transparent) 80%,
+    transparent);
 }
 
 .scene {
