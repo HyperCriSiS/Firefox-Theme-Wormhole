@@ -8,6 +8,18 @@ for (const box of document.querySelectorAll("input[type=checkbox], input[type=co
   box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box[prop] }));
 }
 
+// Firefox silently ignores theme images that are too large (a 1.9 MB PNG
+// header showed nothing), so big headers are stored as JPEG instead.
+async function fitHeader(file, dataUrl) {
+  if (file.size < 1024 * 1024) return dataUrl;
+  const image = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
+  canvas.getContext("2d").drawImage(image, 0, 0);
+  return canvas.toDataURL("image/jpeg", .9);
+}
+
 for (const box of document.querySelectorAll("fieldset[data-key]")) {
   const { key, default: fallback } = box.dataset;
   const preview = box.querySelector("img");
@@ -19,9 +31,10 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      browser.storage.local.set({ [key]: reader.result });
-      show({ [key]: reader.result });
+    reader.onload = async () => {
+      const value = key === "headerImage" ? await fitHeader(file, reader.result) : reader.result;
+      browser.storage.local.set({ [key]: value });
+      show({ [key]: value });
     };
     reader.readAsDataURL(file);
   });
@@ -50,7 +63,7 @@ document.querySelector("#split input").addEventListener("change", async event =>
     return canvas.toDataURL(type, .92);
   };
   await browser.storage.local.set({
-    headerImage: part(0, strip, "image/png"),
+    headerImage: part(0, strip, "image/jpeg"),
     newtabImage: part(strip, image.height - strip, "image/jpeg")
   });
   location.reload();
