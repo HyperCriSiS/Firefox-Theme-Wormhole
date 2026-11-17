@@ -10,7 +10,7 @@
   --wormhole-statusbar-color: #02050c;
   /* Menu and accent colors come from the add-on settings through the theme,
      so menus match custom images without editing this file. */
-  --eh-accent: var(--tab-selected-outline-color, #63f2ff);
+  --eh-accent: var(--lwt-tab-line-color, var(--tab-selected-outline-color, #63f2ff));
   /* Resolved here, because menus redefine the panel variables themselves. */
   --eh-panel: var(--panel-background-color);
   --eh-text: var(--panel-text-color);
