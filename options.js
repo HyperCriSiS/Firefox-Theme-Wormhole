@@ -37,10 +37,10 @@ async function fitHeader(file, dataUrl) {
   return canvas.toDataURL("image/jpeg", .9);
 }
 
-// The user's own picture replaces a gallery set, so the daily set stops.
-const ownPicture = { daily: false };
+// The user's own picture replaces a gallery set and stops the rotation.
+const ownPicture = { daily: false, rotation: "off" };
 const dropGallery = () => {
-  document.getElementById("daily").checked = false;
+  document.getElementById("rotation").value = "off";
   return browser.storage.local.remove("gallerySet");
 };
 
@@ -271,16 +271,24 @@ document.getElementById("gallery-open").addEventListener("click", async () => {
   }
 });
 document.getElementById("gallery-search").addEventListener("input", showGallery);
-document.getElementById("daily").addEventListener("change", async event => {
-  if (!event.target.checked) return;
+const rotation = document.getElementById("rotation");
+browser.storage.local.get(["rotation", "daily"]).then(stored => {
+  rotation.value = stored.rotation || (stored.daily ? "daily" : "off");
+});
+rotation.addEventListener("change", async () => {
+  if (rotation.value === "off") {
+    browser.storage.local.set({ rotation: "off", daily: false });
+    return;
+  }
   try {
     if (!await browser.permissions.request({ origins: GALLERY_ORIGINS })) throw new Error("permission denied");
+    await browser.storage.local.set({ rotation: rotation.value, daily: false });
     await browser.storage.local.remove("dailyDate");
-    await browser.runtime.sendMessage({ daily: true });
+    await browser.runtime.sendMessage({ rotate: true });
     location.reload();
   } catch (error) {
-    event.target.checked = false;
-    browser.storage.local.set({ daily: false });
+    rotation.value = "off";
+    browser.storage.local.set({ rotation: "off", daily: false });
     showError(error);
   }
 });

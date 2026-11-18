@@ -38,9 +38,15 @@
   <fieldset id="gallery">
     <legend>Ready-made sets</legend>
     <button type="button" id="gallery-open">Browse the gallery</button>
-    <label><input type="checkbox" id="daily"> New set every day</label>
+    <label>Change the set automatically
+      <select id="rotation">
+        <option value="off">Off</option>
+        <option value="daily">Every day</option>
+        <option value="start">On every browser start</option>
+      </select>
+    </label>
     <p id="gallery-error" role="alert" hidden></p>
-    <small>Loads sets from the Wormhole-Gallery repository on GitHub. Your own picture replaces the daily set and turns it off. Firefox asks once for permission; nothing is downloaded before you click.</small>
+    <small>Loads sets from the Wormhole-Gallery repository on GitHub. Your own picture stops the automatic change. Firefox asks once for permission; nothing is downloaded before you click.</small>
     <div id="gallery-view" hidden>
       <input type="search" id="gallery-search" placeholder="Search by tag or title, for example: forest night">
       <div id="gallery-grid"></div>
