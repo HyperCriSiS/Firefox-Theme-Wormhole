@@ -63,6 +63,13 @@ browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColo
   if (seamless === false) document.querySelector(".header-continuation").hidden = true;
   if (headerImage) root.setProperty("--header-image", `url("${headerImage}")`);
   if (newtabImage) root.setProperty("--newtab-image", `url("${newtabImage}")`);
+  // Experiment: the theme picture of this screen, shown at window position.
+  browser.runtime.sendMessage({ frame: { width: screen.width, height: screen.height, dpr: devicePixelRatio } }).then(png => {
+    const scene = document.querySelector(".scene").style;
+    scene.backgroundImage = `url("${png}")`;
+    scene.backgroundSize = `${screen.width}px ${screen.height}px`;
+    classes.add("composite");
+  });
   if (bottomColor) root.setProperty("--bottom-color", bottomColor);
 });
 

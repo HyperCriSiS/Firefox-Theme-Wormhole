@@ -548,3 +548,16 @@ body {
 :root.custom-image .particle-layer {
   display: none;
 }
+
+/* Experiment: the page shows the theme picture itself, anchored top right of
+   the window like theme_frame and shifted up by the toolbars, so it runs on
+   without a seam behind toolbars and sidebar. */
+.composite .scene {
+  background-position: right 0 top calc(-1 * var(--chrome-height, 0px));
+  transform: none;
+}
+
+.composite .header-continuation,
+.composite body::before {
+  display: none;
+}

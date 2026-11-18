@@ -59,7 +59,8 @@ function mix(a, b, share) {
 async function applyTheme() {
   const { headerImage, menuColor, accentColor } =
     await browser.storage.local.get(["headerImage", "menuColor", "accentColor"]);
-  const images = { theme_frame: headerImage || eventHorizonTheme.images.theme_frame };
+  composites.clear();
+  const images = { theme_frame: await frameFor(screen.width, screen.height) };
   const colors = { ...eventHorizonTheme.colors };
   if (menuColor) {
     Object.assign(colors, {
@@ -87,8 +88,83 @@ async function applyTheme() {
       sidebar_highlight_text: accentColor
     });
   }
-  browser.theme.update({ ...eventHorizonTheme, images, colors }).catch(console.error);
+  // The picture runs on behind the sidebar, so no border line between them.
+  colors.sidebar_border = "rgba(0, 0, 0, 0)";
+  currentTheme = { ...eventHorizonTheme, images, colors };
+  browser.theme.update(currentTheme).catch(console.error);
 }
+
+// Experiment: one screen-sized picture for header, sidebar and new tab page.
+// The wallpaper is cover-fit to the screen, the header image is anchored top
+// right and fades out at its bottom. Firefox draws theme_frame anchored top
+// right of the window, and the new tab page shows the same picture shifted up
+// by the toolbar height, so both line up. The theme draws one image pixel per
+// CSS pixel (an SVG wrapper is rejected), so on HiDPI the theme gets a picture
+// in CSS pixels and only the new tab page gets one in device pixels.
+let currentTheme;
+const composites = new Map();
+
+function loadImage(src) {
+  const image = new Image();
+  image.src = src;
+  return image.decode().then(() => image);
+}
+
+function composite(width, height, dpr) {
+  const key = `${width}x${height}@${dpr}`;
+  if (!composites.has(key)) composites.set(key, compose(width, height, dpr));
+  return composites.get(key);
+}
+
+function frameFor(width, height) {
+  return composite(width, height, 1).then(c => c.jpg);
+}
+
+async function compose(width, height, dpr) {
+  const { headerImage, newtabImage } = await browser.storage.local.get(["headerImage", "newtabImage"]);
+  const [header, wallpaper] = await Promise.all([
+    loadImage(headerImage || "images/theme_frame.png"),
+    loadImage(newtabImage || "images/newtab-space.jpg")
+  ]);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  const ctx = canvas.getContext("2d");
+  const cover = Math.max(canvas.width / wallpaper.width, canvas.height / wallpaper.height);
+  ctx.drawImage(wallpaper,
+    (canvas.width - wallpaper.width * cover) / 2, (canvas.height - wallpaper.height * cover) / 2,
+    wallpaper.width * cover, wallpaper.height * cover);
+
+  // Header at its CSS size, faded like .header-continuation (40% to 100%).
+  const strip = document.createElement("canvas");
+  strip.width = canvas.width;
+  strip.height = Math.round(header.height * dpr);
+  const sctx = strip.getContext("2d");
+  sctx.drawImage(header, strip.width - header.width * dpr, 0, header.width * dpr, strip.height);
+  const fade = sctx.createLinearGradient(0, 0, 0, strip.height);
+  fade.addColorStop(.4, "#000");
+  fade.addColorStop(1, "transparent");
+  sctx.globalCompositeOperation = "destination-in";
+  sctx.fillStyle = fade;
+  sctx.fillRect(0, 0, strip.width, strip.height);
+  ctx.drawImage(strip, 0, 0);
+
+  // JPEG keeps the theme data small; the new tab page gets a lossless PNG.
+  return { png: canvas.toDataURL("image/png"), jpg: canvas.toDataURL("image/jpeg", .92) };
+}
+
+// New tab pages ask for the picture of their screen; a different size or
+// scale than the current one gets its own picture for that window.
+browser.runtime.onMessage.addListener(async ({ frame }, sender) => {
+  if (!frame) return;
+  const { width, height, dpr } = frame;
+  const theme_frame = await frameFor(width, height);
+  const windowId = sender.tab?.windowId;
+  if (currentTheme && windowId !== undefined && theme_frame !== currentTheme.images.theme_frame) {
+    browser.theme.update(windowId, { ...currentTheme, images: { theme_frame } }).catch(console.error);
+  }
+  return (await composite(width, height, dpr)).png;
+});
 
 // Optional: show the new tab page instead of the home page (new windows,
 // Home button). Off by default; enabled on the options page.
@@ -100,7 +176,7 @@ browser.tabs.onUpdated.addListener(async (tabId, { url }) => {
 
 applyTheme();
 browser.storage.onChanged.addListener(changes => {
-  if (["headerImage", "menuColor", "accentColor"].some(key => key in changes)) applyTheme();
+  if (["headerImage", "newtabImage", "menuColor", "accentColor"].some(key => key in changes)) applyTheme();
 });
 browser.runtime.onInstalled.addListener(applyTheme);
 browser.runtime.onStartup.addListener(applyTheme);
