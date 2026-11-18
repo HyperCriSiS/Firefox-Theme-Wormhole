@@ -54,6 +54,7 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 | Header image | Built-in wormhole | Image painted across all toolbars, anchored top right at its original size. About 3840 x 320 px works best. |
 | New tab background | Built-in space scene | Background of the new tab page. |
 | Only have one image? | None | Fallback: splits one 16:9 image into header (top strip) and new tab background. Two separate images look sharper. |
+| Adjust the picture | Off | Brightness, saturation, tint and a shade behind the toolbars, baked into both images. The originals are kept, so you can change or reset it any time. |
 | Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
 | Menu color | `#090e18` | Menus, panels, sidebar and address bar. Pick a dark tone from your header image. |
 | Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
