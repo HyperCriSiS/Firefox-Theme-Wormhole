@@ -20,6 +20,8 @@
       width: 84px; padding: 0 8px; font: 13px ui-monospace, monospace; text-transform: uppercase;
     }
     #suggest { margin-top: 4px; }
+    #adjust label { display: flex; align-items: center; gap: 10px; }
+    #adjust input[type=range] { width: 220px; margin: 0; }
     section { max-width: 760px; margin-top: 24px; line-height: 1.45; }
     .more { font-size: 12px; opacity: .65; }
     .more h3 { font-size: 12px; margin: 0 0 4px; }
@@ -44,6 +46,15 @@
     <legend>Only have one image? (fallback)</legend>
     <input type="file" accept="image/*">
     <small>Splits one wide image (16:9 or wider) into both images above: the top strip becomes the header, the rest the new tab background, so they always line up. Two separate images look sharper; use this only when your image tool cannot make the 12:1 header.</small>
+  </fieldset>
+  <fieldset id="adjust">
+    <legend>Adjust the picture</legend>
+    <label><input type="range" data-adjust="brightness" min="40" max="160"> Brightness</label>
+    <label><input type="range" data-adjust="saturation" min="0" max="200"> Saturation</label>
+    <label><input type="range" data-adjust="tint" min="0" max="60"> Tint <input type="color" data-adjust="tintColor" aria-label="Tint color"></label>
+    <label><input type="range" data-adjust="top" min="-60" max="60"> Lighten or darken behind the toolbars</label>
+    <button type="button" id="adjust-reset">Reset adjustments</button>
+    <small>Applied to both images when you let go of a slider. Your original images are kept, so you can change or reset this any time.</small>
   </fieldset>
   <fieldset>
     <legend>Colors</legend>

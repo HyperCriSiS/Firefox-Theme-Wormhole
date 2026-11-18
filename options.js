@@ -1,6 +1,6 @@
 // Checkboxes and the color field are stored under their id; the HTML
 // "checked" or "value" attribute is the default.
-for (const box of document.querySelectorAll("input[type=checkbox], input[type=color]")) {
+for (const box of document.querySelectorAll("input[type=checkbox], input[type=color][id]")) {
   const prop = box.type === "checkbox" ? "checked" : "value";
   browser.storage.local.get(box.id).then(stored => {
     if (box.id in stored) box[prop] = stored[box.id];
@@ -37,6 +37,9 @@ async function fitHeader(file, dataUrl) {
   return canvas.toDataURL("image/jpeg", .9);
 }
 
+// Each image keeps its unadjusted original next to it (see "Adjust").
+const original = key => key.replace("Image", "Original");
+
 for (const box of document.querySelectorAll("fieldset[data-key]")) {
   const { key, default: fallback } = box.dataset;
   const preview = box.querySelector("img");
@@ -50,14 +53,14 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
     const reader = new FileReader();
     reader.onload = async () => {
       const value = key === "headerImage" ? await fitHeader(file, reader.result) : reader.result;
-      browser.storage.local.set({ [key]: value });
+      await browser.storage.local.set({ [key]: value, [original(key)]: value });
       show({ [key]: value });
     };
     reader.readAsDataURL(file);
   });
 
   box.querySelector("button").addEventListener("click", () => {
-    browser.storage.local.remove(key);
+    browser.storage.local.remove([key, original(key)]);
     box.querySelector("input").value = "";
     show({});
   });
@@ -79,10 +82,9 @@ document.querySelector("#split input").addEventListener("change", async event =>
     canvas.getContext("2d").drawImage(image, 0, top, image.width, height, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL(type, .92);
   };
-  await browser.storage.local.set({
-    headerImage: part(0, strip, "image/jpeg"),
-    newtabImage: part(strip, image.height - strip, "image/jpeg")
-  });
+  const headerImage = part(0, strip, "image/jpeg");
+  const newtabImage = part(strip, image.height - strip, "image/jpeg");
+  await browser.storage.local.set({ headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage });
   location.reload();
 });
 
@@ -149,8 +151,65 @@ document.getElementById("import").addEventListener("change", async event => {
   const file = event.target.files[0];
   if (!file) return;
   const set = JSON.parse(await file.text());
-  await browser.storage.local.set(Object.fromEntries(SET_KEYS.filter(key => typeof set[key] === "string").map(key => [key, set[key]])));
+  const values = Object.fromEntries(SET_KEYS.filter(key => typeof set[key] === "string").map(key => [key, set[key]]));
+  for (const key of ["headerImage", "newtabImage"]) if (values[key]) values[original(key)] = values[key];
+  await browser.storage.local.set(values);
   location.reload();
+});
+
+// Adjust: brightness, saturation, tint and a shade behind the toolbars are
+// baked into new images, always computed from the originals, so they can be
+// changed or reset any time without losing quality.
+const ADJUST_DEFAULTS = { brightness: 100, saturation: 100, tint: 0, tintColor: "#ff9a3c", top: 0 };
+const controls = [...document.querySelectorAll("[data-adjust]")];
+const showAdjust = values => {
+  for (const control of controls) control.value = { ...ADJUST_DEFAULTS, ...values }[control.dataset.adjust];
+};
+browser.storage.local.get("adjust").then(({ adjust }) => showAdjust(adjust));
+
+async function render(src, isHeader, adjust) {
+  const image = await createImageBitmap(await (await fetch(src)).blob());
+  const canvas = Object.assign(document.createElement("canvas"), { width: image.width, height: image.height });
+  const ctx = canvas.getContext("2d");
+  ctx.filter = `brightness(${adjust.brightness}%) saturate(${adjust.saturation}%)`;
+  ctx.drawImage(image, 0, 0);
+  ctx.filter = "none";
+  if (adjust.tint) {
+    ctx.globalCompositeOperation = "color";
+    ctx.globalAlpha = adjust.tint / 100;
+    ctx.fillStyle = adjust.tintColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+  }
+  if (isHeader && adjust.top) {
+    // Positive darkens, negative lightens the strip behind tabs and toolbars.
+    const rgb = adjust.top > 0 ? "0, 0, 0" : "255, 255, 255";
+    const shade = ctx.createLinearGradient(0, 0, 0, canvas.height * .4);
+    shade.addColorStop(0, `rgba(${rgb}, ${Math.abs(adjust.top) / 100})`);
+    shade.addColorStop(1, `rgba(${rgb}, 0)`);
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, canvas.width, canvas.height * .4);
+  }
+  return canvas.toDataURL("image/jpeg", .92);
+}
+
+async function applyAdjust() {
+  const adjust = Object.fromEntries(controls.map(c => [c.dataset.adjust, c.type === "color" ? c.value : Number(c.value)]));
+  const stored = await browser.storage.local.get(["headerImage", "newtabImage", "headerOriginal", "newtabOriginal"]);
+  const previews = document.querySelectorAll("fieldset[data-key] img");
+  const headerOriginal = stored.headerOriginal || stored.headerImage || previews[0].src;
+  const newtabOriginal = stored.newtabOriginal || stored.newtabImage || previews[1].src;
+  const headerImage = await render(headerOriginal, true, adjust);
+  const newtabImage = await render(newtabOriginal, false, adjust);
+  await browser.storage.local.set({ adjust, headerOriginal, newtabOriginal, headerImage, newtabImage });
+  previews[0].src = headerImage;
+  previews[1].src = newtabImage;
+}
+for (const control of controls) control.addEventListener("change", applyAdjust);
+document.getElementById("adjust-reset").addEventListener("click", () => {
+  showAdjust({});
+  applyAdjust();
 });
 
 const prompt = document.getElementById("prompt");
