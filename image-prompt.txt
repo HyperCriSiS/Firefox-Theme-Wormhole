@@ -1,31 +1,27 @@
-Create two images that belong together for a browser theme. They are shown on top of each other, so they must read as one continuous picture.
+Create one wide landscape image for a browser theme. The theme cuts it into two parts itself: the top strip goes behind the browser tabs and toolbars, the rest becomes the new tab page. Both parts come from the same picture, so they always line up.
 
-IMAGE 1: HEADER STRIP
-- Size 3840 x 320 px (aspect ratio 12:1). If you cannot make that size, make it as wide as possible at 12:1 and I will scale it.
-- It sits behind the browser tabs and toolbars and is anchored to the top right corner. Narrow windows cut it off on the left, so put the main motif in the right third.
-- The top 90 px sit behind tabs, buttons and the address bar. Keep them medium dark so white text and icons stay readable, but not empty: color, soft gradients and parts of the motif (sky, clouds, glow, leaves) may reach into them, and on the right the motif may go all the way to the top. Avoid only bright spots and busy detail behind the left half, where the tab titles sit.
-- The bottom 230 px continue directly onto the page below, so they must flow into the top edge of Image 2: same colors, same lighting, no frame, no border, no hard horizontal line anywhere.
+THE IMAGE
+- Landscape, as wide as you can make it: 16:9 or 2:1. If you can, make it at least 1536 px wide.
+- No text, no logos, no watermarks, no UI elements, no frames, no borders.
+- One continuous picture: no hard horizontal line anywhere.
 
-IMAGE 2: NEW TAB WALLPAPER
-- Size 3840 x 2160 px (aspect ratio 16:9). If you cannot make that size, make it 16:9 and I will scale it.
-- It fills the page below the header. Screens with other aspect ratios crop it a little on the sides or top and bottom, so keep the main motif inside the center 80 %.
-- A browser sidebar may cover the left edge, and the page fades into it there. Keep the left 10 % calm and dark, without important details or objects that would be cut off.
-- The top edge must continue the bottom of Image 1 seamlessly: same colors and lighting, dark near the top.
-- A search field sits centered near the bottom, about 8 % above the bottom edge. Keep that area calm.
-- The last 5 % at the bottom fade into one solid color (the BOTTOM COLOR). Choose it from the image itself, usually its darkest tone, so the fade looks natural.
+WHERE THINGS GO
+- Top 15 %: tabs, buttons and the address bar sit on top of it. Keep it calm, without bright spots, faces or busy detail behind the left half, where the tab titles sit. Sky, clouds, glow or leaves may reach into it, and on the right the motif may go up to the top edge.
+- Left 15 %: a browser sidebar may cover it. Keep it calm, only sky, water, shadow or foliage, with no objects that would be cut off.
+- Main motif in the right third, vertically around the middle. Narrow windows cut the picture on the left, so nothing important there.
+- Center, about 8 % above the bottom edge: a search field sits there. Keep that area calm.
+- Bottom 5 %: fade into one solid color (the BOTTOM COLOR), so the page ends without an edge.
 
-FOR BOTH
-- No text, no logos, no watermarks, no UI elements, no frames.
-- Same art style, color palette and light direction in both images.
+DARK OR LIGHT
+Pick one and keep the whole picture consistent:
+- Dark (default): night, dusk or a darkish scene. Light text sits on top of it.
+- Light: daylight, pastel or misty. Dark text sits on top of it; avoid pure white areas.
 
-IF YOU CAN ONLY MAKE ONE IMAGE
-Two separate images look sharper, so use this only as a fallback. Make one 16:9 image instead, which the theme splits itself: the top 15 % becomes the header strip, the rest the wallpaper. Keep the top 4 % calm and dark (tabs and toolbars sit there), put the main motif in the right half, keep the area about 8 % above the bottom calm and let the last 5 % fade into the BOTTOM COLOR.
-
-AFTER THE IMAGES
-Give me three hex colors taken from the finished images:
-1. BOTTOM COLOR (for example #02050c): checked against the bottom edge of Image 2. I enter it in "Color the new tab page fades into" on the theme's settings page. Waterfox only: also in the line --wormhole-statusbar-color at the top of userChrome.css, so the status bar below the page has the same color. Firefox has no status bar and does not need this.
-2. MENU COLOR (for example #090e18): a dark, calm tone from the header strip for menus, panels and the address bar. Light text must stay easy to read on it (contrast ratio of at least 7:1 with white).
-3. ACCENT COLOR (for example #63f2ff): the most striking light color of the motif, for the selected tab and focused fields. It must stand out clearly on the MENU COLOR.
+AFTER THE IMAGE
+Give me three hex colors taken from the finished image:
+1. BOTTOM COLOR: the color the bottom edge fades into. I enter it in "Color the new tab page fades into" on the theme's settings page. Waterfox only: also in the line --wormhole-statusbar-color at the top of userChrome.css.
+2. MENU COLOR: a calm tone from the top of the image for menus, panels and the address bar. Dark picture: a dark tone (brightness 10 to 25 %), light text must be easy to read on it. Light picture: a light tone (brightness 85 to 95 %), dark text must be easy to read on it.
+3. ACCENT COLOR: the most striking color of the motif, for the selected tab and focused fields. It must stand out clearly on the MENU COLOR.
 
 MY IDEA FOR THE PICTURE:
 [Describe your motif here, for example: a calm aurora over snowy mountains at night, teal and violet.]

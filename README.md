@@ -51,12 +51,11 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 
 | Option | Default | Effect |
 |---|---|---|
-| Header image | Built-in wormhole | Image painted across all toolbars, anchored top right at its original size. About 3840 x 320 px works best. |
-| New tab background | Built-in space scene | Background of the new tab page. |
-| Only have one image? | None | Fallback: splits one 16:9 image into header (top strip) and new tab background. Two separate images look sharper. |
+| Your picture | Built-in wormhole | One wide image (16:9 or 2:1). The top strip becomes the header, the rest the new tab background, so they always line up. |
+| Header image and new tab background | Built-in wormhole and space scene | Advanced: two separate images instead of one. The header is painted across all toolbars, anchored top right; about 3840 x 320 px works best. |
 | Adjust the picture | Off | Brightness, saturation, tint and a shade behind the toolbars, baked into both images. The originals are kept, so you can change or reset it any time. |
 | Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
-| Menu color | `#090e18` | Menus, panels, sidebar and address bar. Pick a dark tone from your header image. |
+| Menu color | `#090e18` | Menus, panels, sidebar and address bar. A dark tone for dark pictures; a light tone switches the browser to dark text and icons for light pictures. |
 | Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
 | Suggest colors from the images | Button | Fills the three colors from your images: the bottom row for the fade, a dark tone for menus, the most vivid hue for the accent. Adjust them afterwards if you like. |
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
@@ -65,7 +64,8 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 
 ## 🎨 Custom images
 
-Both images can be replaced on the settings page. Your files stay in the
+Upload one wide picture on the settings page, or two separate images if you
+prefer. Your files stay in the
 add-on's local storage and are never uploaded.
 
 How the parts fit together:
@@ -86,21 +86,19 @@ How the parts fit together:
 - **Menu and accent color:** menus, panels, sidebar, address bar and the
   selected tab use these two colors from the settings, so they match your
   images in Firefox and Waterfox, with or without `userChrome.css`.
-- **Only one image (fallback):** if your image tool cannot make the 12:1
-  header, upload a single 16:9 image under "Only have one image?". The theme
-  cuts the top strip into the header and the rest into the new tab
-  background. Two separate images stay sharper on large screens, so prefer
-  them when you can.
+- **One picture:** the theme cuts the top strip of your picture into the
+  header and the rest into the new tab background, so both always line up.
+- **Light pictures:** pick a light menu color and the browser switches to dark
+  text and icons, light menus and a light sidebar.
 
 ### Create matching images with AI
 
 [image-prompt.txt](image-prompt.txt) is a prompt for image generators. Paste
 it into the AI tool of your choice, replace the last line with your idea, and
-it describes both images with the sizes, safe areas and fades this theme
-needs. It also asks the AI for three matching colors: the bottom color (settings
-and, in Waterfox, `--wormhole-statusbar-color`), the menu color and the accent
-color. If your tool can only make one image, it describes a single 16:9
-image for the fallback instead. The settings page shows the same prompt with a copy button.
+it describes one wide picture with the safe areas and fades this theme needs,
+dark or light. It also asks the AI for three matching colors: the bottom color
+(settings and, in Waterfox, `--wormhole-statusbar-color`), the menu color and
+the accent color. The settings page shows the same prompt with a copy button.
 
 ## 🧵 Seamless toolbar edge (optional)
 

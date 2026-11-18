@@ -29,6 +29,12 @@
   </style>
 </head>
 <body>
+  <fieldset id="split">
+    <legend>Your picture</legend>
+    <input type="file" accept="image/*">
+    <small>One wide image (16:9 or 2:1). The top strip becomes the header, the rest the new tab background, so they always line up. The AI prompt below describes such a picture.</small>
+  </fieldset>
+  <h3>Or two separate images (advanced)</h3>
   <fieldset data-key="headerImage" data-default="images/theme_frame.png">
     <legend>Header image</legend>
     <img alt="">
@@ -41,11 +47,6 @@
     <img alt="">
     <input type="file" accept="image/*">
     <button type="button">Reset</button>
-  </fieldset>
-  <fieldset id="split">
-    <legend>Only have one image? (fallback)</legend>
-    <input type="file" accept="image/*">
-    <small>Splits one wide image (16:9 or wider) into both images above: the top strip becomes the header, the rest the new tab background, so they always line up. Two separate images look sharper; use this only when your image tool cannot make the 12:1 header.</small>
   </fieldset>
   <fieldset id="adjust">
     <legend>Adjust the picture</legend>
@@ -77,16 +78,15 @@
   <section>
     <h2>How your images fit together</h2>
     <ul>
-      <li><b>Header image:</b> painted behind tabs and toolbars, anchored top right at its original size. The new tab page continues the same image below the toolbars, so they always line up. Use about 3840 × 320 px and keep the main motif on the right.</li>
-      <li><b>Transition:</b> the continuation fades into the new tab background. It looks seamless when the bottom of the header and the top of the background share colors.</li>
+      <li><b>Your picture:</b> its top strip is painted behind tabs and toolbars, anchored top right, and the new tab page shows the rest directly below, so they always line up. Keep the main motif on the right.</li>
       <li><b>New tab background:</b> fills the page, cropped from the center. Its bottom fades into the color chosen above. Waterfox only: set the same color for the status bar in userChrome.css (see below).</li>
-      <li><b>Menu and accent color:</b> pick them to match your images, so menus and the address bar fit the picture. The AI prompt below suggests both.</li>
+      <li><b>Menu and accent color:</b> pick them to match your picture, so menus and the address bar fit it. A light menu color switches the browser to dark text for light pictures. The AI prompt below suggests all three colors.</li>
     </ul>
     <p>Your images are stored only in this browser and never uploaded.</p>
   </section>
   <section>
     <h2>Create matching images with AI</h2>
-    <p>Copy this prompt into an AI image tool and replace the last line with your idea. It asks for both images with the sizes and fades this theme needs.</p>
+    <p>Copy this prompt into an AI image tool and replace the last line with your idea. It asks for one wide picture, dark or light, with the safe areas and fades this theme needs.</p>
     <textarea id="prompt" readonly></textarea>
     <button type="button" id="copy-prompt">Copy prompt</button>
   </section>
