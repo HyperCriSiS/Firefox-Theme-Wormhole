@@ -548,3 +548,22 @@ body {
 :root.custom-image .particle-layer {
   display: none;
 }
+
+/* Light pictures (light menu color): dark text and no dark vignette. */
+:root.light {
+  color-scheme: light;
+  --text: #151c25;
+  --muted: #4b5868;
+}
+
+:root.light .cinematic-shade {
+  background: linear-gradient(to bottom, transparent 61%, var(--bottom-color, #ffffff) 100%);
+}
+
+:root.light #search-input::placeholder {
+  color: rgba(40, 52, 68, .6);
+}
+
+:root.light .cinematic-shade::after {
+  display: none;
+}

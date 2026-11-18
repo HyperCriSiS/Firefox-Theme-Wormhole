@@ -87,8 +87,8 @@ document.querySelector("#split input").addEventListener("change", async event =>
 });
 
 // Suggest colors: the bottom row of the new tab background for the fade,
-// the average hue of the header, kept dark, for menus, and the strongest
-// vivid hue of both images, brightened, for the accent.
+// the average hue of the header, kept dark (or light for light pictures),
+// for menus, and the strongest vivid hue of both images for the accent.
 const hex = rgb => "#" + rgb.map(v => Math.round(Math.min(255, v)).toString(16).padStart(2, "0")).join("");
 const pixels = async (src, size) => {
   const image = await createImageBitmap(await (await fetch(src)).blob());
@@ -121,10 +121,13 @@ document.getElementById("suggest").addEventListener("click", async () => {
   const vivid = buckets.reduce((a, b) => (b.score > a.score ? b : a));
   const accent = vivid.score ? vivid.sum.map(v => v / vivid.score) : [99, 242, 255];
   const tone = average(top.data);
+  // Light pictures get a light menu color (the add-on then uses dark text)
+  // and a darker accent that stays readable on it.
+  const light = (.2126 * tone[0] + .7152 * tone[1] + .0722 * tone[2]) / 255 > .6;
   const colors = {
     bottomColor: hex(average(page.data, page.data.length - page.width * 4)),
-    menuColor: hex(tone.map(v => v * 34 / Math.max(...tone, 1))),
-    accentColor: hex(accent.map(v => v * 245 / Math.max(...accent)))
+    menuColor: hex(light ? tone.map(v => 232 + (v - Math.max(...tone)) * .25) : tone.map(v => v * 34 / Math.max(...tone, 1))),
+    accentColor: hex(accent.map(v => v * (light ? 155 : 245) / Math.max(...accent)))
   };
   for (const [id, value] of Object.entries(colors)) {
     const box = document.getElementById(id);
