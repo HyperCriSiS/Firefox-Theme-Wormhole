@@ -157,27 +157,33 @@ async function applyGallerySet(entry) {
   });
 }
 
-// New set every day: the day number picks the set, so every set comes up once
-// before any repeats. Checked at startup and hourly.
-async function dailySet() {
-  const { daily, dailyDate } = await browser.storage.local.get(["daily", "dailyDate"]);
+// Rotation through the gallery. "daily" picks the set by day number, so every
+// set comes up once before any repeats; checked at startup and hourly.
+// "start" takes the next set on every browser start. An older "daily: true"
+// counts as "daily".
+async function rotateSet(startup = false) {
+  const { rotation, daily, dailyDate, rotationIndex = -1, galleryFilter } =
+    await browser.storage.local.get(["rotation", "daily", "dailyDate", "rotationIndex", "galleryFilter"]);
+  const mode = rotation || (daily ? "daily" : "off");
   const today = new Date().toDateString();
-  if (!daily || dailyDate === today) return;
+  if (mode === "off" || (mode === "daily" && dailyDate === today) || (mode === "start" && !startup)) return;
   if (!await browser.permissions.contains({ origins: GALLERY_ORIGINS })) return;
-  const index = await loadGallery();
+  const index = (await loadGallery()).filter(entry => matchesFilter(entry, galleryFilter));
   if (!index.length) return;
   const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
-  await applyGallerySet(index[day % index.length]);
-  await browser.storage.local.set({ dailyDate: today });
+  const next = mode === "daily" ? day % index.length : (rotationIndex + 1) % index.length;
+  await applyGallerySet(index[next]);
+  await browser.storage.local.set({ dailyDate: today, rotationIndex: next });
 }
 
 browser.runtime.onMessage.addListener(message => {
   if (message.gallerySet) return applyGallerySet(message.gallerySet);
-  if (message.daily) return dailySet();
+  if (message.rotate) return rotateSet(true);
 });
 browser.alarms.create("daily", { periodInMinutes: 60 });
-browser.alarms.onAlarm.addListener(() => dailySet().catch(console.error));
-dailySet().catch(console.error);
+browser.alarms.onAlarm.addListener(() => rotateSet().catch(console.error));
+browser.runtime.onStartup.addListener(() => rotateSet(true).catch(console.error));
+rotateSet().catch(console.error);
 
 applyTheme();
 browser.storage.onChanged.addListener(changes => {
