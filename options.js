@@ -4,8 +4,25 @@ for (const box of document.querySelectorAll("input[type=checkbox], input[type=co
   const prop = box.type === "checkbox" ? "checked" : "value";
   browser.storage.local.get(box.id).then(stored => {
     if (box.id in stored) box[prop] = stored[box.id];
+    if (box.hexField) box.hexField.value = box.value;
   });
   box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box[prop] }));
+  if (box.type !== "color") continue;
+
+  // The native Windows color dialog has no hex field, so offer one here.
+  const hexField = Object.assign(document.createElement("input"), {
+    type: "text", size: 8, maxLength: 7, spellcheck: false, value: box.value
+  });
+  hexField.setAttribute("aria-label", "Hex value");
+  box.after(" ", hexField);
+  box.hexField = hexField;
+  box.addEventListener("input", () => { hexField.value = box.value; });
+  hexField.addEventListener("change", () => {
+    const hex = hexField.value.trim().replace(/^#?/, "#").toLowerCase();
+    if (!/^#[0-9a-f]{6}$/.test(hex)) { hexField.value = box.value; return; }
+    box.value = hexField.value = hex;
+    browser.storage.local.set({ [box.id]: hex });
+  });
 }
 
 // Firefox silently ignores theme images that are too large (a 1.9 MB PNG
@@ -109,7 +126,10 @@ document.getElementById("suggest").addEventListener("click", async () => {
     menuColor: hex(tone.map(v => v * 34 / Math.max(...tone, 1))),
     accentColor: hex(accent.map(v => v * 245 / Math.max(...accent)))
   };
-  for (const [id, value] of Object.entries(colors)) document.getElementById(id).value = value;
+  for (const [id, value] of Object.entries(colors)) {
+    const box = document.getElementById(id);
+    box.value = box.hexField.value = value;
+  }
   browser.storage.local.set(colors);
 });
 
