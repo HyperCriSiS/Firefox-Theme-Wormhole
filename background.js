@@ -129,6 +129,56 @@ browser.tabs.onUpdated.addListener(async (tabId, { url }) => {
   if (homepage) browser.tabs.update(tabId, { url: "newtab.html", loadReplace: true });
 });
 
+// Gallery: ready-made sets from the Wormhole-Gallery repository (gallery.js).
+// Only used after the user grants the optional GitHub permission.
+async function asDataUrl(url) {
+  // Release assets come as application/octet-stream, which Firefox does not
+  // accept as a theme image, so label them as JPEG.
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+  const blob = new Blob([await response.blob()], { type: "image/jpeg" });
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function applyGallerySet(entry) {
+  if (!validSet(entry)) throw new Error("Invalid gallery set");
+  const base = `${RELEASES}${entry.release}/${entry.id}`;
+  const [headerImage, newtabImage] = await Promise.all([asDataUrl(`${base}-header.jpg`), asDataUrl(`${base}-wallpaper.jpg`)]);
+  await browser.storage.local.remove("adjust");
+  await browser.storage.local.set({
+    headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage,
+    bottomColor: entry.colors.bottom, menuColor: entry.colors.menu, accentColor: entry.colors.accent,
+    gallerySet: entry.id
+  });
+}
+
+// New set every day: the day number picks the set, so every set comes up once
+// before any repeats. Checked at startup and hourly.
+async function dailySet() {
+  const { daily, dailyDate } = await browser.storage.local.get(["daily", "dailyDate"]);
+  const today = new Date().toDateString();
+  if (!daily || dailyDate === today) return;
+  if (!await browser.permissions.contains({ origins: GALLERY_ORIGINS })) return;
+  const index = await loadGallery();
+  if (!index.length) return;
+  const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
+  await applyGallerySet(index[day % index.length]);
+  await browser.storage.local.set({ dailyDate: today });
+}
+
+browser.runtime.onMessage.addListener(message => {
+  if (message.gallerySet) return applyGallerySet(message.gallerySet);
+  if (message.daily) return dailySet();
+});
+browser.alarms.create("daily", { periodInMinutes: 60 });
+browser.alarms.onAlarm.addListener(() => dailySet().catch(console.error));
+dailySet().catch(console.error);
+
 applyTheme();
 browser.storage.onChanged.addListener(changes => {
   if (["headerImage", "menuColor", "accentColor"].some(key => key in changes)) applyTheme();
