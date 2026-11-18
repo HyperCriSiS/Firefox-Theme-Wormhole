@@ -224,6 +224,10 @@ document.getElementById("adjust-reset").addEventListener("click", () => {
 
 // Gallery: optional, needs the GitHub permission, which Firefox only grants
 // on a click. The background script downloads and applies a chosen set.
+// The request must start before any await to count as a click; if Firefox
+// still refuses it, an earlier grant is enough.
+const askGallery = () => browser.permissions.request({ origins: GALLERY_ORIGINS })
+  .catch(() => browser.permissions.contains({ origins: GALLERY_ORIGINS }));
 const galleryGrid = document.getElementById("gallery-grid");
 let gallerySets = [];
 let galleryFilter = {};
@@ -288,7 +292,7 @@ function showGallery() {
 }
 
 document.getElementById("gallery-open").addEventListener("click", async () => {
-  if (!await browser.permissions.request({ origins: GALLERY_ORIGINS })) return;
+  if (!await askGallery()) return;
   try {
     gallerySets = await loadGallery();
     galleryError.hidden = true;
@@ -310,7 +314,7 @@ rotation.addEventListener("change", async () => {
     return;
   }
   try {
-    if (!await browser.permissions.request({ origins: GALLERY_ORIGINS })) throw new Error("permission denied");
+    if (!await askGallery()) throw new Error("permission denied");
     await browser.storage.local.set({ rotation: rotation.value, daily: false });
     await browser.storage.local.remove("dailyDate");
     await browser.runtime.sendMessage({ rotate: true });
