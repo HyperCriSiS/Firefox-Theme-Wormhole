@@ -36,12 +36,18 @@
     <input type="file" accept="image/*">
     <small>Splits one wide image (16:9 or wider) into both images above: the top strip becomes the header, the rest the new tab background, so they always line up. Two separate images look sharper; use this only when your image tool cannot make the 12:1 header.</small>
   </fieldset>
-  <label><input type="color" id="bottomColor" value="#02050c"> Color the new tab page fades into at the bottom</label>
-  <label><input type="color" id="menuColor" value="#090e18"> Menu color (menus, panels, sidebar, address bar)</label>
-  <label><input type="color" id="accentColor" value="#63f2ff"> Accent color (selected tab, focused address bar, highlighted menu text)</label>
-  <p><button type="button" id="suggest">Suggest colors from the images</button></p>
-  <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
-  <label><input type="checkbox" id="homepage"> Also use this new tab page for new windows and the Home button</label>
+  <fieldset>
+    <legend>Colors</legend>
+    <label><input type="color" id="bottomColor" value="#02050c"> Color the new tab page fades into at the bottom</label>
+    <label><input type="color" id="menuColor" value="#090e18"> Menu color (menus, panels, sidebar, address bar)</label>
+    <label><input type="color" id="accentColor" value="#63f2ff"> Accent color (selected tab, focused address bar, highlighted menu text)</label>
+    <button type="button" id="suggest">Suggest colors from the images</button>
+  </fieldset>
+  <fieldset>
+    <legend>Options</legend>
+    <label><input type="checkbox" id="seamless" checked> Continue the header image seamlessly on the new tab page</label>
+    <label><input type="checkbox" id="homepage"> Also use this new tab page for new windows and the Home button</label>
+  </fieldset>
   <fieldset>
     <legend>Share a set</legend>
     <button type="button" id="export">Export images and colors</button>
