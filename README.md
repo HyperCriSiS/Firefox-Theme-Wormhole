@@ -147,7 +147,7 @@ Like Wormhole? These add-ons are by the same author.
 
 **Firefox**
 
-- [Sprachverstand](https://addons.mozilla.org/firefox/addon/sprachverstand/): removes gender language from websites.
+- Sprachverstand for [Firefox](https://addons.mozilla.org/firefox/addon/sprachverstand/) and [Thunderbird](https://addons.thunderbird.net/thunderbird/addon/sprachverstand/): removes gender language from websites and emails.
 
 **Thunderbird** (Proton Mail and more)
 
