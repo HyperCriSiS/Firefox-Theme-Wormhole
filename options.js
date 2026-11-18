@@ -14,7 +14,7 @@ for (const box of document.querySelectorAll("input[type=checkbox], input[type=co
     type: "text", size: 8, maxLength: 7, spellcheck: false, value: box.value
   });
   hexField.setAttribute("aria-label", "Hex value");
-  box.after(" ", hexField);
+  box.after(hexField);
   box.hexField = hexField;
   box.addEventListener("input", () => { hexField.value = box.value; });
   hexField.addEventListener("change", () => {
