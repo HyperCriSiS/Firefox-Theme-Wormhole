@@ -226,6 +226,33 @@ document.getElementById("adjust-reset").addEventListener("click", () => {
 // on a click. The background script downloads and applies a chosen set.
 const galleryGrid = document.getElementById("gallery-grid");
 let gallerySets = [];
+let galleryFilter = {};
+browser.storage.local.get("galleryFilter").then(stored => { galleryFilter = stored.galleryFilter || {}; });
+
+// Checkbox lists built from the gallery itself, so new categories and styles
+// show up without an add-on update.
+function buildFilters() {
+  for (const box of document.querySelectorAll(".gallery-filter")) {
+    const field = box.dataset.field;
+    const key = field === "category" ? "categories" : "styles";
+    const values = [...new Set(gallerySets.map(set => set[field]))].sort();
+    box.replaceChildren(box.querySelector("b"), ...values.map(value => {
+      const check = Object.assign(document.createElement("input"), {
+        type: "checkbox", checked: (galleryFilter[key] || []).includes(value)
+      });
+      check.addEventListener("change", () => {
+        const picked = new Set(galleryFilter[key] || []);
+        check.checked ? picked.add(value) : picked.delete(value);
+        galleryFilter = { ...galleryFilter, [key]: [...picked] };
+        browser.storage.local.set({ galleryFilter });
+        showGallery();
+      });
+      const label = document.createElement("label");
+      label.append(check, value);
+      return label;
+    }));
+  }
+}
 const galleryError = document.getElementById("gallery-error");
 const showError = error => {
   galleryError.textContent = `Could not load the gallery: ${error.message}`;
@@ -235,6 +262,7 @@ const showError = error => {
 function showGallery() {
   const words = document.getElementById("gallery-search").value.toLowerCase().split(/\s+/).filter(Boolean);
   galleryGrid.replaceChildren(...gallerySets
+    .filter(set => matchesFilter(set, galleryFilter))
     .filter(set => words.every(word => set.title.toLowerCase().includes(word) || set.tags.some(tag => String(tag).startsWith(word))))
     .map(set => {
       const figure = document.createElement("figure");
@@ -265,6 +293,7 @@ document.getElementById("gallery-open").addEventListener("click", async () => {
     gallerySets = await loadGallery();
     galleryError.hidden = true;
     document.getElementById("gallery-view").hidden = false;
+    buildFilters();
     showGallery();
   } catch (error) {
     showError(error);

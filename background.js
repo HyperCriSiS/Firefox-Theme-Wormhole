@@ -162,13 +162,13 @@ async function applyGallerySet(entry) {
 // "start" takes the next set on every browser start. An older "daily: true"
 // counts as "daily".
 async function rotateSet(startup = false) {
-  const { rotation, daily, dailyDate, rotationIndex = -1 } =
-    await browser.storage.local.get(["rotation", "daily", "dailyDate", "rotationIndex"]);
+  const { rotation, daily, dailyDate, rotationIndex = -1, galleryFilter } =
+    await browser.storage.local.get(["rotation", "daily", "dailyDate", "rotationIndex", "galleryFilter"]);
   const mode = rotation || (daily ? "daily" : "off");
   const today = new Date().toDateString();
   if (mode === "off" || (mode === "daily" && dailyDate === today) || (mode === "start" && !startup)) return;
   if (!await browser.permissions.contains({ origins: GALLERY_ORIGINS })) return;
-  const index = await loadGallery();
+  const index = (await loadGallery()).filter(entry => matchesFilter(entry, galleryFilter));
   if (!index.length) return;
   const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
   const next = mode === "daily" ? day % index.length : (rotationIndex + 1) % index.length;

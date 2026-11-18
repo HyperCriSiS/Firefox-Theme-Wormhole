@@ -21,6 +21,9 @@
     }
     #suggest { margin-top: 4px; }
     #gallery-search { width: 100%; box-sizing: border-box; margin: 4px 0 10px; padding: 6px 8px; }
+    .gallery-filter { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 8px; font-size: 13px; }
+    .gallery-filter b { width: 100%; }
+    .gallery-filter label { display: inline-flex; gap: 4px; margin: 0; }
     #gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-height: 520px; overflow: auto; }
     #gallery-grid figure { margin: 0; }
     #gallery-grid img { width: 100%; max-height: none; margin: 0 0 4px; border-radius: 4px; }
@@ -48,6 +51,9 @@
     <p id="gallery-error" role="alert" hidden></p>
     <small>Loads sets from the Wormhole-Gallery repository on GitHub. Your own picture stops the automatic change. Firefox asks once for permission; nothing is downloaded before you click.</small>
     <div id="gallery-view" hidden>
+      <div class="gallery-filter" data-field="category"><b>Categories</b></div>
+      <div class="gallery-filter" data-field="style"><b>Styles</b></div>
+      <small>Only the checked categories and styles are shown and used for the automatic change. Nothing checked means all.</small>
       <input type="search" id="gallery-search" placeholder="Search by tag or title, for example: forest night">
       <div id="gallery-grid"></div>
     </div>
