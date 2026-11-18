@@ -29,7 +29,7 @@
   ],
   "optional_permissions": [
     "https://raw.githubusercontent.com/*",
-    "https://github.com/*",
+    "https://github.com/HyperCriSiS/*",
     "https://*.githubusercontent.com/*"
   ],
   "options_ui": {
@@ -38,6 +38,7 @@
   },
   "background": {
     "scripts": [
+      "gallery.js",
       "background.js"
     ]
   },

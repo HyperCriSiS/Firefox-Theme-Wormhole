@@ -37,6 +37,13 @@ async function fitHeader(file, dataUrl) {
   return canvas.toDataURL("image/jpeg", .9);
 }
 
+// The user's own picture replaces a gallery set, so the daily set stops.
+const ownPicture = { daily: false };
+const dropGallery = () => {
+  document.getElementById("daily").checked = false;
+  return browser.storage.local.remove("gallerySet");
+};
+
 // Each image keeps its unadjusted original next to it (see "Adjust").
 const original = key => key.replace("Image", "Original");
 
@@ -53,7 +60,8 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
     const reader = new FileReader();
     reader.onload = async () => {
       const value = key === "headerImage" ? await fitHeader(file, reader.result) : reader.result;
-      await browser.storage.local.set({ [key]: value, [original(key)]: value });
+      await dropGallery();
+      await browser.storage.local.set({ [key]: value, [original(key)]: value, ...ownPicture });
       show({ [key]: value });
     };
     reader.readAsDataURL(file);
@@ -84,7 +92,8 @@ document.querySelector("#split input").addEventListener("change", async event =>
   };
   const headerImage = part(0, strip, "image/jpeg");
   const newtabImage = part(strip, image.height - strip, "image/jpeg");
-  await browser.storage.local.set({ headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage });
+  await dropGallery();
+  await browser.storage.local.set({ headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage, ...ownPicture });
   location.reload();
 });
 
@@ -153,7 +162,8 @@ document.getElementById("import").addEventListener("change", async event => {
   const set = JSON.parse(await file.text());
   const values = Object.fromEntries(SET_KEYS.filter(key => typeof set[key] === "string").map(key => [key, set[key]]));
   for (const key of ["headerImage", "newtabImage"]) if (values[key]) values[original(key)] = values[key];
-  await browser.storage.local.set(values);
+  await dropGallery();
+  await browser.storage.local.set({ ...values, ...ownPicture });
   location.reload();
 });
 
@@ -214,15 +224,18 @@ document.getElementById("adjust-reset").addEventListener("click", () => {
 
 // Gallery: optional, needs the GitHub permission, which Firefox only grants
 // on a click. The background script downloads and applies a chosen set.
-const GALLERY = "https://raw.githubusercontent.com/HyperCriSiS/Wormhole-Gallery/main/";
-const ORIGINS = ["https://raw.githubusercontent.com/*", "https://github.com/*", "https://*.githubusercontent.com/*"];
 const galleryGrid = document.getElementById("gallery-grid");
 let gallerySets = [];
+const galleryError = document.getElementById("gallery-error");
+const showError = error => {
+  galleryError.textContent = `Could not load the gallery: ${error.message}`;
+  galleryError.hidden = false;
+};
 
 function showGallery() {
   const words = document.getElementById("gallery-search").value.toLowerCase().split(/\s+/).filter(Boolean);
   galleryGrid.replaceChildren(...gallerySets
-    .filter(set => words.every(word => set.title.toLowerCase().includes(word) || set.tags.some(tag => tag.startsWith(word))))
+    .filter(set => words.every(word => set.title.toLowerCase().includes(word) || set.tags.some(tag => String(tag).startsWith(word))))
     .map(set => {
       const figure = document.createElement("figure");
       const image = Object.assign(document.createElement("img"), { src: GALLERY + set.preview, alt: set.title, loading: "lazy" });
@@ -231,8 +244,14 @@ function showGallery() {
       use.addEventListener("click", async () => {
         use.disabled = true;
         use.textContent = "Loading…";
-        await browser.runtime.sendMessage({ gallerySet: set });
-        location.reload();
+        try {
+          await browser.runtime.sendMessage({ gallerySet: set });
+          location.reload();
+        } catch (error) {
+          showError(error);
+          use.disabled = false;
+          use.textContent = "Use";
+        }
       });
       caption.append(set.title, use);
       figure.append(image, caption);
@@ -241,22 +260,29 @@ function showGallery() {
 }
 
 document.getElementById("gallery-open").addEventListener("click", async () => {
-  if (!await browser.permissions.request({ origins: ORIGINS })) return;
-  gallerySets = await (await fetch(GALLERY + "index.json", { cache: "no-store" })).json();
-  document.getElementById("gallery-view").hidden = false;
-  showGallery();
+  if (!await browser.permissions.request({ origins: GALLERY_ORIGINS })) return;
+  try {
+    gallerySets = await loadGallery();
+    galleryError.hidden = true;
+    document.getElementById("gallery-view").hidden = false;
+    showGallery();
+  } catch (error) {
+    showError(error);
+  }
 });
 document.getElementById("gallery-search").addEventListener("input", showGallery);
 document.getElementById("daily").addEventListener("change", async event => {
   if (!event.target.checked) return;
-  if (!await browser.permissions.request({ origins: ORIGINS })) {
+  try {
+    if (!await browser.permissions.request({ origins: GALLERY_ORIGINS })) throw new Error("permission denied");
+    await browser.storage.local.remove("dailyDate");
+    await browser.runtime.sendMessage({ daily: true });
+    location.reload();
+  } catch (error) {
     event.target.checked = false;
     browser.storage.local.set({ daily: false });
-    return;
+    showError(error);
   }
-  await browser.storage.local.remove("dailyDate");
-  await browser.runtime.sendMessage({ daily: true });
-  location.reload();
 });
 
 const prompt = document.getElementById("prompt");
