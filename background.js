@@ -54,6 +54,12 @@ function mix(a, b, share) {
   ).join("");
 }
 
+// Relative brightness of a #rrggbb color, 0 (black) to 1 (white).
+function lightness(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return .2126 * r + .7152 * g + .0722 * b;
+}
+
 // Menu and accent color from the options page drive every themed surface
 // that is not the header image, so menus match the user's own images.
 async function applyTheme() {
@@ -87,7 +93,32 @@ async function applyTheme() {
       sidebar_highlight_text: accentColor
     });
   }
-  browser.theme.update({ ...eventHorizonTheme, images, colors }).catch(console.error);
+  // A light menu color means a light picture: switch text and icons to dark.
+  const light = menuColor && lightness(menuColor) > .55;
+  if (light) {
+    Object.assign(colors, {
+      tab_background_text: "#3b4654",
+      tab_selected: "rgba(255, 255, 255, 0.35)",
+      tab_text: "#111821",
+      toolbar_text: "#1a2330",
+      bookmark_text: "#1a2330",
+      toolbar_vertical_separator: "rgba(20, 30, 45, 0.18)",
+      toolbar_field_text: "#111821",
+      toolbar_field_text_focus: "#000000",
+      toolbar_field_border: mix(menuColor, "#000000", .18),
+      toolbar_field_highlight_text: "#ffffff",
+      icons: "#26313d",
+      popup_text: "#151c25",
+      popup_border: mix(menuColor, "#000000", .15),
+      popup_highlight: mix(menuColor, "#000000", .07),
+      sidebar_text: "#1a2330",
+      sidebar_border: mix(menuColor, "#000000", .1),
+      sidebar_highlight: mix(menuColor, "#000000", .07),
+      ntp_text: "#151c25"
+    });
+  }
+  const properties = light ? { color_scheme: "light", content_color_scheme: "light" } : eventHorizonTheme.properties;
+  browser.theme.update({ ...eventHorizonTheme, images, colors, properties }).catch(console.error);
 }
 
 // Optional: show the new tab page instead of the home page (new windows,

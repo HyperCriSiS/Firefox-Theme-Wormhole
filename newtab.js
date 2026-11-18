@@ -55,6 +55,11 @@ browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColo
   const classes = document.documentElement.classList;
   if (newtabImage) classes.add("custom-image");
   if (menuColor) root.setProperty("--frame", menuColor);
+  // Same rule as background.js: a light menu color means a light picture.
+  if (menuColor) {
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(menuColor.slice(i, i + 2), 16) / 255);
+    classes.toggle("light", .2126 * r + .7152 * g + .0722 * b > .55);
+  }
   if (menuColor || accentColor) {
     classes.add("custom-colors");
     root.setProperty("--menu", menuColor || "#090e18");
