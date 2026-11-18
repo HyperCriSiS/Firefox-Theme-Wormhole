@@ -212,6 +212,53 @@ document.getElementById("adjust-reset").addEventListener("click", () => {
   applyAdjust();
 });
 
+// Gallery: optional, needs the GitHub permission, which Firefox only grants
+// on a click. The background script downloads and applies a chosen set.
+const GALLERY = "https://raw.githubusercontent.com/HyperCriSiS/Wormhole-Gallery/main/";
+const ORIGINS = ["https://raw.githubusercontent.com/*", "https://github.com/*", "https://*.githubusercontent.com/*"];
+const galleryGrid = document.getElementById("gallery-grid");
+let gallerySets = [];
+
+function showGallery() {
+  const words = document.getElementById("gallery-search").value.toLowerCase().split(/\s+/).filter(Boolean);
+  galleryGrid.replaceChildren(...gallerySets
+    .filter(set => words.every(word => set.title.toLowerCase().includes(word) || set.tags.some(tag => tag.startsWith(word))))
+    .map(set => {
+      const figure = document.createElement("figure");
+      const image = Object.assign(document.createElement("img"), { src: GALLERY + set.preview, alt: set.title, loading: "lazy" });
+      const caption = document.createElement("figcaption");
+      const use = Object.assign(document.createElement("button"), { type: "button", textContent: "Use" });
+      use.addEventListener("click", async () => {
+        use.disabled = true;
+        use.textContent = "Loading…";
+        await browser.runtime.sendMessage({ gallerySet: set });
+        location.reload();
+      });
+      caption.append(set.title, use);
+      figure.append(image, caption);
+      return figure;
+    }));
+}
+
+document.getElementById("gallery-open").addEventListener("click", async () => {
+  if (!await browser.permissions.request({ origins: ORIGINS })) return;
+  gallerySets = await (await fetch(GALLERY + "index.json", { cache: "no-store" })).json();
+  document.getElementById("gallery-view").hidden = false;
+  showGallery();
+});
+document.getElementById("gallery-search").addEventListener("input", showGallery);
+document.getElementById("daily").addEventListener("change", async event => {
+  if (!event.target.checked) return;
+  if (!await browser.permissions.request({ origins: ORIGINS })) {
+    event.target.checked = false;
+    browser.storage.local.set({ daily: false });
+    return;
+  }
+  await browser.storage.local.remove("dailyDate");
+  await browser.runtime.sendMessage({ daily: true });
+  location.reload();
+});
+
 const prompt = document.getElementById("prompt");
 fetch("image-prompt.txt").then(r => r.text()).then(text => { prompt.value = text; });
 document.getElementById("copy-prompt").addEventListener("click", () => {

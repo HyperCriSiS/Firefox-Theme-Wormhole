@@ -24,7 +24,13 @@
     "theme",
     "storage",
     "search",
-    "tabs"
+    "tabs",
+    "alarms"
+  ],
+  "optional_permissions": [
+    "https://raw.githubusercontent.com/*",
+    "https://github.com/*",
+    "https://*.githubusercontent.com/*"
   ],
   "options_ui": {
     "page": "options.html",

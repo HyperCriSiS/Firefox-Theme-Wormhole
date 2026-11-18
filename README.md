@@ -51,6 +51,7 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 
 | Option | Default | Effect |
 |---|---|---|
+| Ready-made sets | Off | Browse the [Wormhole Gallery](https://github.com/HyperCriSiS/Wormhole-Gallery), search by tag and use a set with one click, or get a new set every day. Asks once for access to GitHub; nothing is downloaded before you opt in. |
 | Your picture | Built-in wormhole | One wide image (16:9 or 2:1). The top strip becomes the header, the rest the new tab background, so they always line up. |
 | Header image and new tab background | Built-in wormhole and space scene | Advanced: two separate images instead of one. The header is painted across all toolbars, anchored top right; about 3840 x 320 px works best. |
 | Adjust the picture | Off | Brightness, saturation, tint and a shade behind the toolbars, baked into both images. The originals are kept, so you can change or reset it any time. |
