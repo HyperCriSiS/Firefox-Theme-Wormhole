@@ -156,10 +156,11 @@ async function applyGallerySet(entry) {
 // set comes up once before any repeats; checked at startup and hourly.
 // "start" takes the next set on every browser start. An older "daily: true"
 // counts as "daily".
-// One run at a time: alarm, message and startup may overlap.
-let rotating = null;
+// Runs one after another: alarm, message and startup may overlap, and each
+// run checks again whether there is anything to do.
+let rotating = Promise.resolve();
 function rotateSet(startup = false) {
-  rotating ||= rotateOnce(startup).finally(() => { rotating = null; });
+  rotating = rotating.catch(() => {}).then(() => rotateOnce(startup));
   return rotating;
 }
 

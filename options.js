@@ -68,6 +68,20 @@ const dropGallery = () => {
 // Each image keeps its unadjusted original next to it (see "Adjust").
 const original = key => key.replace("Image", "Original");
 
+// Before pictures are replaced, the adjustment ends: a picture that is not
+// replaced goes back to its original, so no original is ever lost.
+async function endAdjust(replaced) {
+  const stored = await browser.storage.local.get(["headerOriginal", "newtabOriginal", "adjust"]);
+  const restore = {};
+  if (stored.adjust) {
+    for (const key of ["headerImage", "newtabImage"]) {
+      if (!replaced.includes(key) && stored[original(key)]) restore[key] = stored[original(key)];
+    }
+  }
+  if (Object.keys(restore).length) await browser.storage.local.set(restore);
+  await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
+}
+
 for (const box of document.querySelectorAll("fieldset[data-key]")) {
   const { key, default: fallback } = box.dataset;
   const preview = box.querySelector("img");
@@ -83,11 +97,8 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
       say("Loading picture…");
       const value = await fitImage(file);
       await dropGallery();
-      // A new picture starts unadjusted; the original is kept only once a
-      // slider is used.
-      await browser.storage.local.remove([original(key), "adjust"]);
+      await endAdjust([key]);
       await browser.storage.local.set({ [key]: value, ...ownPicture });
-      showAdjust({});
       show({ [key]: value });
       say("");
     } catch (error) {
@@ -123,9 +134,8 @@ document.querySelector("#split input").addEventListener("change", async event =>
     const headerImage = part(0, strip, 3840);
     const newtabImage = part(strip, image.height - strip, Math.min(3840, image.width));
     await dropGallery();
-    await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
+    await endAdjust(["headerImage", "newtabImage"]);
     await browser.storage.local.set({ headerImage, newtabImage, ...ownPicture });
-    showAdjust({});
     say("");
   } catch (error) {
     failed("Splitting the picture")(error);
@@ -188,6 +198,11 @@ document.getElementById("reset-colors").addEventListener("click", () => {
 
 // The home page option needs the optional "tabs" permission to see when a
 // tab opens the home page; it is requested on the click that turns it on.
+browser.storage.local.get("homepage").then(async ({ homepage }) => {
+  if (homepage && !await browser.permissions.contains({ permissions: ["tabs"] })) {
+    say("The home page option needs access to tabs. Turn it on again to allow it.", true);
+  }
+});
 document.getElementById("homepage").addEventListener("change", async event => {
   if (!event.target.checked) return;
   if (!await browser.permissions.request({ permissions: ["tabs"] }).catch(() => false)) {
@@ -221,10 +236,13 @@ document.getElementById("import").addEventListener("change", async event => {
       if (IMAGE.test(set[key])) values[key] = await fitImage(await (await fetch(set[key])).blob());
     }
     if (!Object.keys(values).length) throw new Error("no pictures or colors found in this file");
-    await dropGallery();
-    await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
-    await browser.storage.local.set({ ...values, ...ownPicture });
-    showAdjust({});
+    const pictures = ["headerImage", "newtabImage"].filter(key => key in values);
+    if (pictures.length) {
+      await dropGallery();
+      await endAdjust(pictures);
+      Object.assign(values, ownPicture);
+    }
+    await browser.storage.local.set(values);
     say("Set imported.");
   } catch (error) {
     failed("Importing the set")(error);
@@ -240,6 +258,7 @@ const showAdjust = values => {
   for (const control of controls) control.value = { ...ADJUST_DEFAULTS, ...values }[control.dataset.adjust];
 };
 browser.storage.local.get("adjust").then(({ adjust }) => showAdjust(adjust));
+refreshers.push(changes => { if ("adjust" in changes) showAdjust(changes.adjust.newValue || {}); });
 
 async function render(src, isHeader, adjust) {
   const image = await createImageBitmap(await (await fetch(src)).blob());
@@ -273,24 +292,32 @@ async function applyAdjust() {
   const stored = await browser.storage.local.get(["headerImage", "newtabImage", "headerOriginal", "newtabOriginal", "adjust"]);
   // Originals are null for the built-in pictures. Once adjusted, the stored
   // image is a rendering, never an original.
-  const unadjusted = key => stored[original(key)] || (stored.adjust ? null : stored[key]) || null;
+  const unadjusted = key => {
+    const value = stored[original(key)] || (stored.adjust ? null : stored[key]);
+    return String(value).startsWith("data:") ? value : null;
+  };
   const headerOriginal = unadjusted("headerImage");
   const newtabOriginal = unadjusted("newtabImage");
   const previews = document.querySelectorAll("fieldset[data-key] img");
   const builtIn = [...document.querySelectorAll("fieldset[data-key]")].map(box => box.dataset.default);
   if (controls.every(c => String(adjust[c.dataset.adjust]) === String(ADJUST_DEFAULTS[c.dataset.adjust]))) {
-    // Back to the untouched originals, without re-encoding them.
-    await browser.storage.local.remove(["adjust", "headerOriginal", "newtabOriginal", "headerImage", "newtabImage"]);
-    await browser.storage.local.set({
-      ...(headerOriginal && { headerImage: headerOriginal }),
-      ...(newtabOriginal && { newtabImage: newtabOriginal })
-    });
+    if (!stored.adjust) return;
+    // Back to the untouched originals, without re-encoding them, in one write.
+    const restored = { headerImage: headerOriginal, newtabImage: newtabOriginal };
+    await browser.storage.local.set(Object.fromEntries(Object.entries(restored).filter(([, value]) => value)));
+    await browser.storage.local.remove(["adjust", "headerOriginal", "newtabOriginal",
+      ...Object.keys(restored).filter(key => !restored[key])]);
     previews[0].src = headerOriginal || builtIn[0];
     previews[1].src = newtabOriginal || builtIn[1];
     return;
   }
   const headerImage = await render(headerOriginal || builtIn[0], true, adjust);
   const newtabImage = await render(newtabOriginal || builtIn[1], false, adjust);
+  // A set may have changed while rendering (gallery, rotation): keep it.
+  const now = await browser.storage.local.get(["headerImage", "newtabImage"]);
+  if (now.headerImage !== stored.headerImage || now.newtabImage !== stored.newtabImage) {
+    throw new Error("the picture changed while adjusting; try again");
+  }
   await browser.storage.local.set({
     adjust, headerImage, newtabImage,
     ...(headerOriginal && { headerOriginal }), ...(newtabOriginal && { newtabOriginal })
@@ -373,7 +400,6 @@ function showGallery() {
         use.textContent = "Loading…";
         try {
           await browser.runtime.sendMessage({ gallerySet: set });
-          showAdjust({});
           say(`Using "${set.title}".`);
           use.disabled = false;
           use.textContent = "Use";
