@@ -49,26 +49,26 @@ function updateChromeHeight() {
 updateChromeHeight();
 window.addEventListener("resize", updateChromeHeight);
 
-// Custom images chosen on the options page.
-browser.storage.local.get(["headerImage", "newtabImage", "seamless", "bottomColor", "menuColor", "accentColor"]).then(({ headerImage, newtabImage, seamless, bottomColor, menuColor, accentColor }) => {
+// Custom images chosen on the options page; open pages follow every change.
+const STORED = ["headerImage", "newtabImage", "seamless", "bottomColor", "menuColor", "accentColor"];
+function applyStored({ headerImage, newtabImage, seamless, bottomColor, menuColor, accentColor }) {
   const root = document.documentElement.style;
   const classes = document.documentElement.classList;
-  if (newtabImage) classes.add("custom-image");
-  if (menuColor) root.setProperty("--frame", menuColor);
-  // Same rule as background.js: a light menu color means a light picture.
-  if (menuColor) {
-    const [r, g, b] = [1, 3, 5].map(i => parseInt(menuColor.slice(i, i + 2), 16) / 255);
-    classes.toggle("light", .2126 * r + .7152 * g + .0722 * b > .55);
-  }
-  if (menuColor || accentColor) {
-    classes.add("custom-colors");
-    root.setProperty("--menu", menuColor || "#090e18");
-    root.setProperty("--accent", accentColor || "#63f2ff");
-  }
-  if (seamless === false) document.querySelector(".header-continuation").hidden = true;
-  if (headerImage) root.setProperty("--header-image", `url("${headerImage}")`);
-  if (newtabImage) root.setProperty("--newtab-image", `url("${newtabImage}")`);
-  if (bottomColor) root.setProperty("--bottom-color", bottomColor);
+  classes.toggle("custom-image", Boolean(newtabImage));
+  classes.toggle("custom-colors", Boolean(menuColor || accentColor));
+  classes.toggle("light", Boolean(menuColor) && lightness(menuColor) > .55);
+  const set = (name, value) => value ? root.setProperty(name, value) : root.removeProperty(name);
+  set("--frame", menuColor);
+  set("--menu", (menuColor || accentColor) && (menuColor || "#090e18"));
+  set("--accent", (menuColor || accentColor) && (accentColor || "#63f2ff"));
+  set("--header-image", headerImage && `url("${headerImage}")`);
+  set("--newtab-image", newtabImage && `url("${newtabImage}")`);
+  set("--bottom-color", bottomColor);
+  document.querySelector(".header-continuation").hidden = seamless === false;
+}
+browser.storage.local.get(STORED).then(applyStored);
+browser.storage.onChanged.addListener(changes => {
+  if (STORED.some(key => key in changes)) browser.storage.local.get(STORED).then(applyStored);
 });
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");

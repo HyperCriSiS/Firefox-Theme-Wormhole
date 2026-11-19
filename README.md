@@ -55,12 +55,13 @@ Open `about:addons`, then **Wormhole** and **Settings**.
 | Your picture | Built-in wormhole | One wide image (16:9 or 2:1). The top strip becomes the header, the rest the new tab background, so they always line up. |
 | Header image and new tab background | Built-in wormhole and space scene | Advanced: two separate images instead of one. The header is painted across all toolbars, anchored top right; about 3840 x 320 px works best. |
 | Adjust the picture | Off | Brightness, saturation, tint and a shade behind the toolbars, baked into both images. The originals are kept, so you can change or reset it any time. |
+| Reset colors | Button | Returns menu, accent and bottom color to the built-in look. |
 | Bottom color | `#02050c` | Color the new tab page fades into at the bottom. Waterfox only: use the same value for `--wormhole-statusbar-color` in `userChrome.css`. |
 | Menu color | `#090e18` | Menus, panels, sidebar and address bar. A dark tone for dark pictures; a light tone switches the browser to dark text and icons for light pictures. |
 | Accent color | `#63f2ff` | Selected tab, focused address bar and highlighted menu text. |
 | Suggest colors from the images | Button | Fills the three colors from your images: the bottom row for the fade, a dark tone for menus, the most vivid hue for the accent. Adjust them afterwards if you like. |
 | Continue the header image seamlessly | On | Continues the header image on the new tab page. Off shows a visible edge below the toolbars. |
-| Also use this new tab page for new windows and the Home button | Off | Replaces the home page in new windows and for the Home button. |
+| Also use this new tab page for new windows and the Home button | Off | Replaces the home page in new windows and for the Home button. Asks for access to tabs when turned on. |
 | Share a set | Buttons | Exports both images and the three colors as one JSON file, or imports such a file. |
 
 ## 🎨 Custom images

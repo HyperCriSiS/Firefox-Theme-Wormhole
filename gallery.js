@@ -3,7 +3,16 @@
 // and paths may only hold safe characters, so they cannot point elsewhere.
 const GALLERY = "https://raw.githubusercontent.com/HyperCriSiS/Wormhole-Gallery/main/";
 const RELEASES = "https://github.com/HyperCriSiS/Wormhole-Gallery/releases/download/";
-const GALLERY_ORIGINS = ["https://raw.githubusercontent.com/*", "https://github.com/HyperCriSiS/*", "https://*.githubusercontent.com/*"];
+// Release downloads redirect to *.githubusercontent.com, which also covers
+// raw.githubusercontent.com.
+const GALLERY_ORIGINS = ["https://github.com/HyperCriSiS/*", "https://*.githubusercontent.com/*"];
+
+// Relative brightness of a #rrggbb color, 0 (black) to 1 (white). A light menu
+// color means a light picture: dark text and icons.
+function lightness(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return .2126 * r + .7152 * g + .0722 * b;
+}
 
 function validSet(entry) {
   const name = /^[\w.-]+$/;

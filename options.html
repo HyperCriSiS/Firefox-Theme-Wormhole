@@ -35,11 +35,13 @@
     #adjust input[type=range] { width: 220px; margin: 0; }
     section { max-width: 760px; margin-top: 24px; line-height: 1.45; }
     .more { font-size: 12px; opacity: .65; }
-    .more h3 { font-size: 12px; margin: 0 0 4px; }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .more h2 { font-size: 12px; margin: 0 0 4px; }
     textarea { width: 100%; height: 220px; font: 12px ui-monospace, monospace; }
   </style>
 </head>
 <body>
+  <h1>Wormhole settings</h1>
   <p id="status" role="alert" hidden></p>
   <fieldset id="gallery">
     <legend>Ready-made sets</legend>
@@ -62,21 +64,21 @@
   </fieldset>
   <fieldset id="split">
     <legend>Your picture</legend>
-    <input type="file" accept="image/*">
+    <input type="file" accept="image/*" aria-label="Choose your picture">
     <small>One wide image (16:9 or 2:1). The top strip becomes the header, the rest the new tab background, so they always line up. The AI prompt below describes such a picture.</small>
   </fieldset>
-  <h3>Or two separate images (advanced)</h3>
+  <h2>Or two separate images (advanced)</h2>
   <fieldset data-key="headerImage" data-default="images/theme_frame.png">
     <legend>Header image</legend>
     <img alt="">
-    <input type="file" accept="image/*">
+    <input type="file" accept="image/*" aria-label="Choose header image">
     <button type="button">Reset</button>
     <small>Anchored top right at its original size. Use an image about 3840 × 320 px.</small>
   </fieldset>
   <fieldset data-key="newtabImage" data-default="images/newtab-space.jpg">
     <legend>New tab background</legend>
     <img alt="">
-    <input type="file" accept="image/*">
+    <input type="file" accept="image/*" aria-label="Choose new tab background">
     <button type="button">Reset</button>
   </fieldset>
   <fieldset id="adjust">
@@ -94,6 +96,7 @@
     <label><input type="color" id="menuColor" value="#090e18"> Menu color (menus, panels, sidebar, address bar)</label>
     <label><input type="color" id="accentColor" value="#63f2ff"> Accent color (selected tab, focused address bar, highlighted menu text)</label>
     <button type="button" id="suggest">Suggest colors from the images</button>
+    <button type="button" id="reset-colors">Reset colors</button>
   </fieldset>
   <fieldset>
     <legend>Options</legend>
@@ -127,7 +130,7 @@
   </section>
   <p><a href="https://github.com/HyperCriSiS/Firefox-Theme-Wormhole#readme" target="_blank" rel="noreferrer">Full documentation and userChrome.css setup on GitHub</a></p>
   <section class="more">
-    <h3>More add-ons by the same author</h3>
+    <h2>More add-ons by the same author</h2>
     <ul>
       <li>Sprachverstand (<a href="https://addons.mozilla.org/firefox/addon/sprachverstand/" target="_blank" rel="noreferrer">Firefox</a>, <a href="https://addons.thunderbird.net/thunderbird/addon/sprachverstand/" target="_blank" rel="noreferrer">Thunderbird</a>): removes gender language from websites and emails.</li>
       <li><a href="https://github.com/Broton-Your-bro-for-Proton/All-Mail-Buddy" target="_blank" rel="noreferrer">All Mail Buddy</a> (Thunderbird): real folders in Proton Mail Bridge's All Mail.</li>
