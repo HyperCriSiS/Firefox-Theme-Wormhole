@@ -29,6 +29,8 @@
     #gallery-grid img { width: 100%; max-height: none; margin: 0 0 4px; border-radius: 4px; }
     #gallery-grid figcaption { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; }
     #gallery-grid button { margin: 0; }
+    #status { position: sticky; top: 0; z-index: 1; margin: 0 0 12px; padding: 8px 12px; border-radius: 6px; background: Canvas; border: 1px solid currentColor; }
+    #status.error { color: #d93636; }
     #adjust label { display: flex; align-items: center; gap: 10px; }
     #adjust input[type=range] { width: 220px; margin: 0; }
     section { max-width: 760px; margin-top: 24px; line-height: 1.45; }
@@ -38,6 +40,7 @@
   </style>
 </head>
 <body>
+  <p id="status" role="alert" hidden></p>
   <fieldset id="gallery">
     <legend>Ready-made sets</legend>
     <button type="button" id="gallery-open">Browse the gallery</button>
@@ -48,7 +51,6 @@
         <option value="start">On every browser start</option>
       </select>
     </label>
-    <p id="gallery-error" role="alert" hidden></p>
     <small>Loads sets from the Wormhole-Gallery repository on GitHub. Your own picture stops the automatic change. Firefox asks once for permission; nothing is downloaded before you click.</small>
     <div id="gallery-view" hidden>
       <div class="gallery-filter" data-field="category"><b>Categories</b></div>

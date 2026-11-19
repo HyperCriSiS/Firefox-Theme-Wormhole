@@ -1,3 +1,12 @@
+// One status line for every action on this page.
+const status = document.getElementById("status");
+function say(message, error = false) {
+  status.textContent = message;
+  status.classList.toggle("error", error);
+  status.hidden = !message;
+}
+const failed = what => error => say(`${what} failed: ${error.message || error}`, true);
+
 // Checkboxes and the color field are stored under their id; the HTML
 // "checked" or "value" attribute is the default.
 for (const box of document.querySelectorAll("input[type=checkbox], input[type=color][id]")) {
@@ -25,15 +34,16 @@ for (const box of document.querySelectorAll("input[type=checkbox], input[type=co
   });
 }
 
-// Firefox silently ignores theme images that are too large (a 1.9 MB PNG
-// header showed nothing), so big headers are stored as JPEG instead.
-async function fitHeader(file, dataUrl) {
-  if (file.size < 1024 * 1024) return dataUrl;
-  const image = await createImageBitmap(file);
-  const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
-  canvas.getContext("2d").drawImage(image, 0, 0);
+// Every stored picture goes through here: at most 3840 px wide (more is never
+// visible) and JPEG, because Firefox silently drops large theme images and
+// storage holds them as data URLs. Smaller pictures are not upscaled.
+async function fitImage(source, width = 3840) {
+  const image = await createImageBitmap(source);
+  const scale = Math.min(1, width / image.width);
+  const canvas = Object.assign(document.createElement("canvas"), {
+    width: Math.round(image.width * scale), height: Math.round(image.height * scale)
+  });
+  canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
   return canvas.toDataURL("image/jpeg", .9);
 }
 
@@ -54,21 +64,27 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
 
   browser.storage.local.get(key).then(show);
 
-  box.querySelector("input").addEventListener("change", event => {
+  box.querySelector("input").addEventListener("change", async event => {
     const file = event.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const value = key === "headerImage" ? await fitHeader(file, reader.result) : reader.result;
+    try {
+      say("Loading picture…");
+      const value = await fitImage(file);
       await dropGallery();
-      await browser.storage.local.set({ [key]: value, [original(key)]: value, ...ownPicture });
+      // A new picture starts unadjusted; the original is kept only once a
+      // slider is used.
+      await browser.storage.local.remove([original(key), "adjust"]);
+      await browser.storage.local.set({ [key]: value, ...ownPicture });
+      showAdjust({});
       show({ [key]: value });
-    };
-    reader.readAsDataURL(file);
+      say("");
+    } catch (error) {
+      failed("Loading the picture")(error);
+    }
   });
 
   box.querySelector("button").addEventListener("click", () => {
-    browser.storage.local.remove([key, original(key)]);
+    browser.storage.local.remove([key, original(key), "adjust", "gallerySet"]);
     box.querySelector("input").value = "";
     show({});
   });
@@ -79,22 +95,26 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
 document.querySelector("#split input").addEventListener("change", async event => {
   const file = event.target.files[0];
   if (!file) return;
-  const image = await createImageBitmap(file);
-  const width = 3840;
-  const scale = width / image.width;
-  const strip = image.width / 12;
-  const part = (top, height, type) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = Math.round(height * scale);
-    canvas.getContext("2d").drawImage(image, 0, top, image.width, height, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL(type, .92);
-  };
-  const headerImage = part(0, strip, "image/jpeg");
-  const newtabImage = part(strip, image.height - strip, "image/jpeg");
-  await dropGallery();
-  await browser.storage.local.set({ headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage, ...ownPicture });
-  location.reload();
+  try {
+    say("Splitting picture…");
+    const image = await createImageBitmap(file);
+    const strip = image.width / 12;
+    const part = (top, height, width) => {
+      const canvas = Object.assign(document.createElement("canvas"), { width, height: Math.round(height * width / image.width) });
+      canvas.getContext("2d").drawImage(image, 0, top, image.width, height, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", .9);
+    };
+    // The header must span the toolbars of wide screens, so it is always
+    // 3840 px wide; the background is only scaled down.
+    const headerImage = part(0, strip, 3840);
+    const newtabImage = part(strip, image.height - strip, Math.min(3840, image.width));
+    await dropGallery();
+    await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
+    await browser.storage.local.set({ headerImage, newtabImage, ...ownPicture });
+    location.reload();
+  } catch (error) {
+    failed("Splitting the picture")(error);
+  }
 });
 
 // Suggest colors: the bottom row of the new tab background for the fade,
@@ -156,15 +176,28 @@ document.getElementById("export").addEventListener("click", async () => {
   link.download = "wormhole-set.json";
   link.click();
 });
+// A set file may come from anyone: accept only picture data and hex colors.
+const IMAGE = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
+const COLOR = /^#[0-9a-f]{6}$/i;
 document.getElementById("import").addEventListener("change", async event => {
   const file = event.target.files[0];
   if (!file) return;
-  const set = JSON.parse(await file.text());
-  const values = Object.fromEntries(SET_KEYS.filter(key => typeof set[key] === "string").map(key => [key, set[key]]));
-  for (const key of ["headerImage", "newtabImage"]) if (values[key]) values[original(key)] = values[key];
-  await dropGallery();
-  await browser.storage.local.set({ ...values, ...ownPicture });
-  location.reload();
+  try {
+    say("Importing set…");
+    const set = JSON.parse(await file.text());
+    const values = {};
+    for (const key of ["bottomColor", "menuColor", "accentColor"]) if (COLOR.test(set[key])) values[key] = set[key];
+    for (const key of ["headerImage", "newtabImage"]) {
+      if (IMAGE.test(set[key])) values[key] = await fitImage(await (await fetch(set[key])).blob());
+    }
+    if (!Object.keys(values).length) throw new Error("no pictures or colors found in this file");
+    await dropGallery();
+    await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
+    await browser.storage.local.set({ ...values, ...ownPicture });
+    location.reload();
+  } catch (error) {
+    failed("Importing the set")(error);
+  }
 });
 
 // Adjust: brightness, saturation, tint and a shade behind the toolbars are
@@ -206,20 +239,51 @@ async function render(src, isHeader, adjust) {
 
 async function applyAdjust() {
   const adjust = Object.fromEntries(controls.map(c => [c.dataset.adjust, c.type === "color" ? c.value : Number(c.value)]));
-  const stored = await browser.storage.local.get(["headerImage", "newtabImage", "headerOriginal", "newtabOriginal"]);
+  const stored = await browser.storage.local.get(["headerImage", "newtabImage", "headerOriginal", "newtabOriginal", "adjust"]);
+  // Originals are null for the built-in pictures. Once adjusted, the stored
+  // image is a rendering, never an original.
+  const unadjusted = key => stored[original(key)] || (stored.adjust ? null : stored[key]) || null;
+  const headerOriginal = unadjusted("headerImage");
+  const newtabOriginal = unadjusted("newtabImage");
   const previews = document.querySelectorAll("fieldset[data-key] img");
-  const headerOriginal = stored.headerOriginal || stored.headerImage || previews[0].src;
-  const newtabOriginal = stored.newtabOriginal || stored.newtabImage || previews[1].src;
-  const headerImage = await render(headerOriginal, true, adjust);
-  const newtabImage = await render(newtabOriginal, false, adjust);
-  await browser.storage.local.set({ adjust, headerOriginal, newtabOriginal, headerImage, newtabImage });
+  const builtIn = [...document.querySelectorAll("fieldset[data-key]")].map(box => box.dataset.default);
+  if (controls.every(c => String(adjust[c.dataset.adjust]) === String(ADJUST_DEFAULTS[c.dataset.adjust]))) {
+    // Back to the untouched originals, without re-encoding them.
+    await browser.storage.local.remove(["adjust", "headerOriginal", "newtabOriginal", "headerImage", "newtabImage"]);
+    await browser.storage.local.set({
+      ...(headerOriginal && { headerImage: headerOriginal }),
+      ...(newtabOriginal && { newtabImage: newtabOriginal })
+    });
+    previews[0].src = headerOriginal || builtIn[0];
+    previews[1].src = newtabOriginal || builtIn[1];
+    return;
+  }
+  const headerImage = await render(headerOriginal || builtIn[0], true, adjust);
+  const newtabImage = await render(newtabOriginal || builtIn[1], false, adjust);
+  await browser.storage.local.set({
+    adjust, headerImage, newtabImage,
+    ...(headerOriginal && { headerOriginal }), ...(newtabOriginal && { newtabOriginal })
+  });
   previews[0].src = headerImage;
   previews[1].src = newtabImage;
 }
-for (const control of controls) control.addEventListener("change", applyAdjust);
+// One run at a time; the sliders wait while a run renders.
+async function adjustSafely() {
+  for (const control of controls) control.disabled = true;
+  say("Applying…");
+  try {
+    await applyAdjust();
+    say("");
+  } catch (error) {
+    failed("Adjusting the picture")(error);
+  } finally {
+    for (const control of controls) control.disabled = false;
+  }
+}
+for (const control of controls) control.addEventListener("change", adjustSafely);
 document.getElementById("adjust-reset").addEventListener("click", () => {
   showAdjust({});
-  applyAdjust();
+  adjustSafely();
 });
 
 // Gallery: optional, needs the GitHub permission, which Firefox only grants
@@ -257,11 +321,7 @@ function buildFilters() {
     }));
   }
 }
-const galleryError = document.getElementById("gallery-error");
-const showError = error => {
-  galleryError.textContent = `Could not load the gallery: ${error.message}`;
-  galleryError.hidden = false;
-};
+const showError = failed("Loading the gallery");
 
 function showGallery() {
   const words = document.getElementById("gallery-search").value.toLowerCase().split(/\s+/).filter(Boolean);
@@ -295,7 +355,7 @@ document.getElementById("gallery-open").addEventListener("click", async () => {
   if (!await askGallery()) return;
   try {
     gallerySets = await loadGallery();
-    galleryError.hidden = true;
+    say("");
     document.getElementById("gallery-view").hidden = false;
     buildFilters();
     showGallery();
