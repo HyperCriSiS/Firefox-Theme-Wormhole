@@ -7,13 +7,24 @@ function say(message, error = false) {
 }
 const failed = what => error => say(`${what} failed: ${error.message || error}`, true);
 
+// Previews, colors and the rotation follow storage, so nothing on this page
+// needs a reload when a set changes, also when the background switches it.
+const refreshers = [];
+browser.storage.onChanged.addListener(changes => {
+  for (const refresh of refreshers) refresh(changes);
+});
+
 // Checkboxes and the color field are stored under their id; the HTML
 // "checked" or "value" attribute is the default.
 for (const box of document.querySelectorAll("input[type=checkbox], input[type=color][id]")) {
   const prop = box.type === "checkbox" ? "checked" : "value";
-  browser.storage.local.get(box.id).then(stored => {
-    if (box.id in stored) box[prop] = stored[box.id];
+  const load = stored => {
+    box[prop] = box.id in stored ? stored[box.id] : box.type === "checkbox" ? box.defaultChecked : box.defaultValue;
     if (box.hexField) box.hexField.value = box.value;
+  };
+  browser.storage.local.get(box.id).then(load);
+  refreshers.push(changes => {
+    if (box.id in changes) load(changes[box.id].newValue === undefined ? {} : { [box.id]: changes[box.id].newValue });
   });
   box.addEventListener("change", () => browser.storage.local.set({ [box.id]: box[prop] }));
   if (box.type !== "color") continue;
@@ -63,6 +74,7 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
   const show = stored => { preview.src = stored[key] || fallback; };
 
   browser.storage.local.get(key).then(show);
+  refreshers.push(changes => { if (key in changes) show({ [key]: changes[key].newValue }); });
 
   box.querySelector("input").addEventListener("change", async event => {
     const file = event.target.files[0];
@@ -85,6 +97,8 @@ for (const box of document.querySelectorAll("fieldset[data-key]")) {
 
   box.querySelector("button").addEventListener("click", () => {
     browser.storage.local.remove([key, original(key), "adjust", "gallerySet"]);
+    browser.storage.local.set(ownPicture);
+    showAdjust({});
     box.querySelector("input").value = "";
     show({});
   });
@@ -111,7 +125,8 @@ document.querySelector("#split input").addEventListener("change", async event =>
     await dropGallery();
     await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
     await browser.storage.local.set({ headerImage, newtabImage, ...ownPicture });
-    location.reload();
+    showAdjust({});
+    say("");
   } catch (error) {
     failed("Splitting the picture")(error);
   }
@@ -167,6 +182,21 @@ document.getElementById("suggest").addEventListener("click", async () => {
   browser.storage.local.set(colors);
 });
 
+document.getElementById("reset-colors").addEventListener("click", () => {
+  browser.storage.local.remove(["bottomColor", "menuColor", "accentColor"]);
+});
+
+// The home page option needs the optional "tabs" permission to see when a
+// tab opens the home page; it is requested on the click that turns it on.
+document.getElementById("homepage").addEventListener("change", async event => {
+  if (!event.target.checked) return;
+  if (!await browser.permissions.request({ permissions: ["tabs"] }).catch(() => false)) {
+    event.target.checked = false;
+    browser.storage.local.set({ homepage: false });
+    say("The home page option needs access to tabs.", true);
+  }
+});
+
 // Sets: both images and the three colors in one JSON file.
 const SET_KEYS = ["headerImage", "newtabImage", "bottomColor", "menuColor", "accentColor"];
 document.getElementById("export").addEventListener("click", async () => {
@@ -194,7 +224,8 @@ document.getElementById("import").addEventListener("change", async event => {
     await dropGallery();
     await browser.storage.local.remove(["headerOriginal", "newtabOriginal", "adjust"]);
     await browser.storage.local.set({ ...values, ...ownPicture });
-    location.reload();
+    showAdjust({});
+    say("Set imported.");
   } catch (error) {
     failed("Importing the set")(error);
   }
@@ -304,6 +335,8 @@ function buildFilters() {
     const field = box.dataset.field;
     const key = field === "category" ? "categories" : "styles";
     const values = [...new Set(gallerySets.map(set => set[field]))].sort();
+    // Drop picks that no longer exist in the gallery.
+    galleryFilter = { ...galleryFilter, [key]: (galleryFilter[key] || []).filter(value => values.includes(value)) };
     box.replaceChildren(box.querySelector("b"), ...values.map(value => {
       const check = Object.assign(document.createElement("input"), {
         type: "checkbox", checked: (galleryFilter[key] || []).includes(value)
@@ -315,6 +348,7 @@ function buildFilters() {
         browser.storage.local.set({ galleryFilter });
         showGallery();
       });
+      browser.storage.local.set({ galleryFilter });
       const label = document.createElement("label");
       label.append(check, value);
       return label;
@@ -333,12 +367,16 @@ function showGallery() {
       const image = Object.assign(document.createElement("img"), { src: GALLERY + set.preview, alt: set.title, loading: "lazy" });
       const caption = document.createElement("figcaption");
       const use = Object.assign(document.createElement("button"), { type: "button", textContent: "Use" });
+      use.setAttribute("aria-label", `Use ${set.title}`);
       use.addEventListener("click", async () => {
         use.disabled = true;
         use.textContent = "Loading…";
         try {
           await browser.runtime.sendMessage({ gallerySet: set });
-          location.reload();
+          showAdjust({});
+          say(`Using "${set.title}".`);
+          use.disabled = false;
+          use.textContent = "Use";
         } catch (error) {
           showError(error);
           use.disabled = false;
@@ -365,9 +403,13 @@ document.getElementById("gallery-open").addEventListener("click", async () => {
 });
 document.getElementById("gallery-search").addEventListener("input", showGallery);
 const rotation = document.getElementById("rotation");
-browser.storage.local.get(["rotation", "daily"]).then(stored => {
+browser.storage.local.get(["rotation", "daily"]).then(async stored => {
   rotation.value = stored.rotation || (stored.daily ? "daily" : "off");
+  if (rotation.value !== "off" && !await browser.permissions.contains({ origins: GALLERY_ORIGINS })) {
+    say("Access to GitHub was removed, so the automatic change is paused. Choose it again to allow access.", true);
+  }
 });
+refreshers.push(changes => { if ("rotation" in changes) rotation.value = changes.rotation.newValue || "off"; });
 rotation.addEventListener("change", async () => {
   if (rotation.value === "off") {
     browser.storage.local.set({ rotation: "off", daily: false });
@@ -378,7 +420,7 @@ rotation.addEventListener("change", async () => {
     await browser.storage.local.set({ rotation: rotation.value, daily: false });
     await browser.storage.local.remove("dailyDate");
     await browser.runtime.sendMessage({ rotate: true });
-    location.reload();
+    say("");
   } catch (error) {
     rotation.value = "off";
     browser.storage.local.set({ rotation: "off", daily: false });

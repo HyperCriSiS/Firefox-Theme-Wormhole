@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Wormhole",
   "version": "1.4.0",
-  "description": "Dark cinematic theme with a seamless wormhole header across all toolbars and a matching new tab page.",
+  "description": "Your own picture, dark or light, running seamlessly across all toolbars and the new tab page. Ready-made sets optional.",
   "homepage_url": "https://github.com/HyperCriSiS/Firefox-Theme-Wormhole",
   "icons": {
     "16": "icons/icon-16.png",
@@ -24,11 +24,10 @@
     "theme",
     "storage",
     "search",
-    "tabs",
     "alarms"
   ],
   "optional_permissions": [
-    "https://raw.githubusercontent.com/*",
+    "tabs",
     "https://github.com/HyperCriSiS/*",
     "https://*.githubusercontent.com/*"
   ],

@@ -54,12 +54,6 @@ function mix(a, b, share) {
   ).join("");
 }
 
-// Relative brightness of a #rrggbb color, 0 (black) to 1 (white).
-function lightness(hex) {
-  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
-  return .2126 * r + .7152 * g + .0722 * b;
-}
-
 // Menu and accent color from the options page drive every themed surface
 // that is not the header image, so menus match the user's own images.
 async function applyTheme() {
@@ -122,7 +116,8 @@ async function applyTheme() {
 }
 
 // Optional: show the new tab page instead of the home page (new windows,
-// Home button). Off by default; enabled on the options page.
+// Home button). Off by default; enabled on the options page, which asks for
+// the optional "tabs" permission. Without it the url is never reported.
 browser.tabs.onUpdated.addListener(async (tabId, { url }) => {
   if (url !== "about:home") return;
   const { homepage } = await browser.storage.local.get("homepage");
@@ -149,9 +144,9 @@ async function applyGallerySet(entry) {
   if (!validSet(entry)) throw new Error("Invalid gallery set");
   const base = `${RELEASES}${entry.release}/${entry.id}`;
   const [headerImage, newtabImage] = await Promise.all([asDataUrl(`${base}-header.jpg`), asDataUrl(`${base}-wallpaper.jpg`)]);
-  await browser.storage.local.remove("adjust");
+  await browser.storage.local.remove(["adjust", "headerOriginal", "newtabOriginal"]);
   await browser.storage.local.set({
-    headerImage, newtabImage, headerOriginal: headerImage, newtabOriginal: newtabImage,
+    headerImage, newtabImage,
     bottomColor: entry.colors.bottom, menuColor: entry.colors.menu, accentColor: entry.colors.accent,
     gallerySet: entry.id
   });
@@ -161,14 +156,25 @@ async function applyGallerySet(entry) {
 // set comes up once before any repeats; checked at startup and hourly.
 // "start" takes the next set on every browser start. An older "daily: true"
 // counts as "daily".
-async function rotateSet(startup = false) {
+// One run at a time: alarm, message and startup may overlap.
+let rotating = null;
+function rotateSet(startup = false) {
+  rotating ||= rotateOnce(startup).finally(() => { rotating = null; });
+  return rotating;
+}
+
+async function rotateOnce(startup) {
   const { rotation, daily, dailyDate, rotationIndex = -1, galleryFilter } =
     await browser.storage.local.get(["rotation", "daily", "dailyDate", "rotationIndex", "galleryFilter"]);
   const mode = rotation || (daily ? "daily" : "off");
   const today = new Date().toDateString();
   if (mode === "off" || (mode === "daily" && dailyDate === today) || (mode === "start" && !startup)) return;
   if (!await browser.permissions.contains({ origins: GALLERY_ORIGINS })) return;
-  const index = (await loadGallery()).filter(entry => matchesFilter(entry, galleryFilter));
+  const all = await loadGallery();
+  // A filter that matches nothing (for example a removed category) falls
+  // back to the whole gallery instead of stopping silently.
+  const picked = all.filter(entry => matchesFilter(entry, galleryFilter));
+  const index = picked.length ? picked : all;
   if (!index.length) return;
   const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
   const next = mode === "daily" ? day % index.length : (rotationIndex + 1) % index.length;
@@ -182,12 +188,12 @@ browser.runtime.onMessage.addListener(message => {
 });
 browser.alarms.create("daily", { periodInMinutes: 60 });
 browser.alarms.onAlarm.addListener(() => rotateSet().catch(console.error));
-browser.runtime.onStartup.addListener(() => rotateSet(true).catch(console.error));
-rotateSet().catch(console.error);
+// The background page loads once per browser start (and on install or update),
+// which counts as a start for the "start" mode.
+rotateSet(true).catch(console.error);
 
 applyTheme();
 browser.storage.onChanged.addListener(changes => {
   if (["headerImage", "menuColor", "accentColor"].some(key => key in changes)) applyTheme();
 });
-browser.runtime.onInstalled.addListener(applyTheme);
-browser.runtime.onStartup.addListener(applyTheme);
+
