@@ -361,7 +361,9 @@ function buildFilters() {
   for (const box of document.querySelectorAll(".gallery-filter")) {
     const field = box.dataset.field;
     const key = field === "category" ? "categories" : "styles";
-    const values = [...new Set(gallerySets.map(set => set[field]))].sort();
+    // Variants of the built-in picture lead the list.
+    const values = [...new Set(gallerySets.map(set => set[field]))]
+      .sort((a, b) => (b === "wormhole") - (a === "wormhole") || (a < b ? -1 : a > b));
     // Drop picks that no longer exist in the gallery.
     galleryFilter = { ...galleryFilter, [key]: (galleryFilter[key] || []).filter(value => values.includes(value)) };
     box.replaceChildren(box.querySelector("b"), ...values.map(value => {
