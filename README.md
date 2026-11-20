@@ -2,7 +2,7 @@
 
 # Wormhole
 
-**A dark space theme for Firefox and Waterfox where the header looks like one seamless picture.**
+**A Firefox and Waterfox theme where one picture runs seamlessly across the header and the new tab page. Pick one from the gallery or use your own.**
 
 [![CI](https://github.com/HyperCriSiS/Firefox-Theme-Wormhole/actions/workflows/ci.yml/badge.svg)](https://github.com/HyperCriSiS/Firefox-Theme-Wormhole/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/HyperCriSiS/Firefox-Theme-Wormhole?label=Release)](https://github.com/HyperCriSiS/Firefox-Theme-Wormhole/releases/latest)
@@ -15,6 +15,13 @@ page below them. Toggling the bookmarks toolbar shows more or less of the same
 image instead of stretching it. Web pages themselves stay untouched: a theme
 cannot paint behind them.
 
+The built-in wormhole is only the start. Pick a ready-made set from the
+[Wormhole Gallery](https://github.com/HyperCriSiS/Wormhole-Gallery)
+(landscapes, space, cities, animals and more, dark or light), let Wormhole
+switch to a new one every day, or upload your own picture. Gallery sets bring
+matching menu, accent and fade colors; for your own picture the settings
+suggest them.
+
 > [!IMPORTANT]
 > Requires Firefox or Waterfox 140 or later. The release file is not signed by
 > Mozilla, so regular Firefox only accepts it as a temporary add-on; Waterfox
@@ -23,10 +30,13 @@ cannot paint behind them.
 
 ## ✨ Features
 
+- Ready-made picture sets from the gallery: search by tag and apply one with a click.
+- Automatic rotation: a new set every day or on every browser start.
+- Your own pictures: upload one wide image; it stays on your computer.
+- Matching colors: menus, accent and fade suggested from the picture, dark or light.
 - One continuous header image across all toolbars, with no separator lines.
 - New tab page that continues the header image and follows toolbar height changes.
 - Search on the new tab page uses your default search engine.
-- Custom header and new tab images from the settings page.
 - Optional: use the new tab page for new windows and the Home button too.
 - Optional `userChrome.css` that also removes the last line between toolbars and page.
 
